@@ -1,0 +1,156 @@
+[{
+  "_id": {
+    "$oid": "66d7a486f4e4aefee64a88ba"
+  },
+  "user": {
+    "$oid": "66d652edf94d1bc6817c7dcf"
+  },
+  "showing": {
+    "$oid": "66d10ece4eb032980fd9468f"
+  },
+  "seats": [
+    "A1",
+    "A2"
+  ],
+  "status": "pending",
+  "createdAt": {
+    "$date": "2024-09-04T00:06:30.010Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:06:30.010Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a4caf4e4aefee64a88c4"
+  },
+  "user": {
+    "$oid": "66d652edf94d1bc6817c7dcf"
+  },
+  "showing": {
+    "$oid": "66d10ece4eb032980fd9468f"
+  },
+  "seats": [
+    "A1",
+    "A2"
+  ],
+  "status": "purchased",
+  "createdAt": {
+    "$date": "2024-09-04T00:07:38.175Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:07:38.175Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a4eaf4e4aefee64a88d7"
+  },
+  "user": {
+    "$oid": "66d652edf94d1bc6817c7dcf"
+  },
+  "showing": {
+    "$oid": "66d10ece4eb032980fd9468f"
+  },
+  "seats": [
+    "B1"
+  ],
+  "status": "pending",
+  "createdAt": {
+    "$date": "2024-09-04T00:08:10.132Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:08:10.132Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a50af4e4aefee64a88e4"
+  },
+  "user": {
+    "$oid": "66d652edf94d1bc6817c7dcf"
+  },
+  "showing": {
+    "$oid": "66d10ece4eb032980fd9468f"
+  },
+  "seats": [
+    "B1"
+  ],
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2024-09-04T00:08:42.340Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:08:42.340Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a594f4e4aefee64a88f3"
+  },
+  "user": {
+    "$oid": "66d652edf94d1bc6817c7dcf"
+  },
+  "showing": {
+    "$oid": "66d10ece4eb032980fd9468f"
+  },
+  "seats": [
+    "B1"
+  ],
+  "status": "reserved",
+  "createdAt": {
+    "$date": "2024-09-04T00:11:00.777Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:11:00.777Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a5d2f4e4aefee64a8908"
+  },
+  "user": {
+    "$oid": "66d652edf94d1bc6817c7dcf"
+  },
+  "showing": {
+    "$oid": "66d10ece4eb032980fd9468f"
+  },
+  "seats": [
+    "B1"
+  ],
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2024-09-04T00:12:02.621Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:12:02.621Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a5f4f4e4aefee64a8913"
+  },
+  "user": {
+    "$oid": "66d652edf94d1bc6817c7dcf"
+  },
+  "showing": {
+    "$oid": "66d10ece4eb032980fd9468f"
+  },
+  "seats": [
+    "B1"
+  ],
+  "status": "cancelled",
+  "createdAt": {
+    "$date": "2024-09-04T00:12:36.630Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:13:20.449Z"
+  },
+  "__v": 0
+}]

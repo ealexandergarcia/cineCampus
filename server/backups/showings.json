@@ -1,0 +1,33 @@
+[{
+  "_id": {
+    "$oid": "66d10ece4eb032980fd9468f"
+  },
+  "movie": {
+    "$oid": "66d10e5a4eb032980fd9468b"
+  },
+  "room": {
+    "$oid": "66d10e7a4eb032980fd9468d"
+  },
+  "date": "2024-09-20",
+  "time": "19:00",
+  "availableSeats": [
+    {
+      "name": "A1",
+      "price": 15,
+      "type": "VIP",
+      "available": false
+    },
+    {
+      "name": "A2",
+      "price": 15,
+      "type": "VIP",
+      "available": false
+    },
+    {
+      "name": "B1",
+      "price": 10,
+      "type": "Regular",
+      "available": true
+    }
+  ]
+}]

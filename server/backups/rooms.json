@@ -1,0 +1,14 @@
+[{
+  "_id": {
+    "$oid": "66d10e7a4eb032980fd9468d"
+  },
+  "name": "Room 1",
+  "price": 10
+},
+{
+  "_id": {
+    "$oid": "66d10e7a4eb032980fd9468e"
+  },
+  "name": "Room 2",
+  "price": 15
+}]

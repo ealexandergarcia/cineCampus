@@ -1,0 +1,26 @@
+[{
+  "_id": {
+    "$oid": "66d10e5a4eb032980fd9468b"
+  },
+  "title": "Inception",
+  "genre": [
+    "Sci-Fi",
+    "Thriller"
+  ],
+  "director": "Christopher Nolan",
+  "duration": 148,
+  "synopsis": "A thief who steals corporate secrets through the use of dream-sharing technology is given a chance to have his criminal history erased if he can successfully implant an idea into a target's subconscious."
+},
+{
+  "_id": {
+    "$oid": "66d10e5a4eb032980fd9468c"
+  },
+  "title": "The Matrix",
+  "genre": [
+    "Action",
+    "Sci-Fi"
+  ],
+  "director": "Wachowskis",
+  "duration": 136,
+  "synopsis": "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers."
+}]

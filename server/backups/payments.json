@@ -1,0 +1,66 @@
+[{
+  "_id": {
+    "$oid": "66d7a486f4e4aefee64a88bc"
+  },
+  "movement": {
+    "$oid": "66d7a486f4e4aefee64a88ba"
+  },
+  "discount": null,
+  "paymentMethod": "credit_card",
+  "status": "accepted",
+  "amount": 40,
+  "date": {
+    "$date": "2024-09-04T00:06:30.012Z"
+  },
+  "createdAt": {
+    "$date": "2024-09-04T00:06:30.013Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:07:38.173Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a4eaf4e4aefee64a88d9"
+  },
+  "movement": {
+    "$oid": "66d7a4eaf4e4aefee64a88d7"
+  },
+  "discount": null,
+  "paymentMethod": "credit_card",
+  "status": "cancelled",
+  "amount": 20,
+  "date": {
+    "$date": "2024-09-04T00:08:10.133Z"
+  },
+  "createdAt": {
+    "$date": "2024-09-04T00:08:10.134Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:08:42.339Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a5aff4e4aefee64a88fd"
+  },
+  "movement": {
+    "$oid": "66d7a594f4e4aefee64a88f3"
+  },
+  "discount": null,
+  "paymentMethod": "credit_card",
+  "status": "rejected",
+  "amount": 20,
+  "date": {
+    "$date": "2024-09-04T00:11:27.595Z"
+  },
+  "createdAt": {
+    "$date": "2024-09-04T00:11:27.596Z"
+  },
+  "updatedAt": {
+    "$date": "2024-09-04T00:12:02.620Z"
+  },
+  "__v": 0
+}]

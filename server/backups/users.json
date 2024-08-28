@@ -1,0 +1,59 @@
+[{
+  "_id": {
+    "$oid": "66d10e4b4eb032980fd94689"
+  },
+  "role": "VIP",
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "123",
+  "phone": "+1234567890",
+  "card": {
+    "$oid": "66d10e164eb032980fd94687"
+  }
+},
+{
+  "_id": {
+    "$oid": "66d10e4b4eb032980fd9468a"
+  },
+  "role": "standard",
+  "name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "password": "123",
+  "phone": "+0987654321",
+  "card": null
+},
+{
+  "_id": {
+    "$oid": "66d559a260d084674f879d5c"
+  },
+  "role": "standard",
+  "name": "Edwin",
+  "email": "edwin@example.com",
+  "password": "1234",
+  "phone": "+54",
+  "card": {
+    "$oid": "66d57050f63220b086ebfc6c"
+  }
+},
+{
+  "_id": {
+    "$oid": "66d652edf94d1bc6817c7dcf"
+  },
+  "name": "Juan Prez",
+  "email": "ssssss@example.com",
+  "password": "$2a$10$djDJ4gURjtSpkDRM4PCxreK7.wTuxpS2I6TTlWCQTxyWqgeBN7EqK",
+  "phone": "1234567890",
+  "role": "VIP",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d7a680f4e4aefee64a8925"
+  },
+  "name": "Edax",
+  "email": "Edax@example.com",
+  "password": "$2a$10$25ov2EV9wX.ctf5ZGFxLEOenlUCSz9d5BIlT8Iqo7bZ9trmt8s8ay",
+  "phone": "1234567890",
+  "role": "VIP",
+  "__v": 0
+}]
