@@ -1,26 +1,25 @@
+// models/functionsModel.js
 const mongoose = require('mongoose');
 
 const functionSchema = new mongoose.Schema({
-  movie: {
+  pelicula: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Movie',
     required: true
   },
-  room: {
+  sala: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Room',
     required: true
   },
-  date: {
+  fecha: {
     type: Date,
     required: true
   },
-  time: {
+  hora: {
     type: String,
     required: true
   }
 });
 
-const Function = mongoose.model('Function', functionSchema);
-
-module.exports = Function;
+module.exports = mongoose.model('Function', functionSchema);
