@@ -4,6 +4,17 @@ const Funcion = require('../models/functionsModel');
 const { handleAsync } = require('../utils/handleAsync');
 
 
+/**
+ * @function listarPeliculas
+ * @description Consulta todas las películas disponibles en el catálogo, incluyendo título, género, duración y horarios de proyección.
+ * @async
+ * @method
+ * @param {Object} req - Objeto de solicitud HTTP.
+ * @param {Object} res - Objeto de respuesta HTTP para enviar la respuesta al cliente.
+ * @returns {void}
+ * @throws {Error} Lanza un error si la consulta falla.
+ * @response {Array} Responde con una lista de películas, cada una con su título, género, duración y horarios de proyección.
+ */
 exports.listarPeliculas = handleAsync(async (req, res) => {
   const peliculas = await Pelicula.aggregate([
     {
@@ -21,38 +32,16 @@ exports.listarPeliculas = handleAsync(async (req, res) => {
       }
     },
     {
-      $addFields: {
-        'funciones.fecha': {
-          $dateToString: {
-            format: '%d-%m-%Y',
-            date: '$funciones.fecha'
-          }
-        }
-      }
-    },
-    {
-      $project: {
-        _id: 1,
-        titulo: 1,
-        director: 1,
-        duracion: 1,
-        estado: 1,
-        genero: 1,
-        funciones: {
-          _id: 1,
-          fecha: 1,
-          hora: 1
-        }
-      }
-    },
-    {
       $group: {
         _id: '$_id',
         titulo: { $first: '$titulo' },
         duracion: { $first: '$duracion' },
         estado: { $first: '$estado' },
         genero: { $first: '$genero' },
-        funciones: { $push: '$funciones' }
+        funciones: { $push: {
+          fecha: { $dateToString: { format: "%d-%m-%Y", date: "$funciones.fecha", timezone: "America/Bogota" } },
+          hora: "$funciones.hora"
+        }} // Agrupa funciones asociadas
       }
     },
     {
@@ -64,6 +53,17 @@ exports.listarPeliculas = handleAsync(async (req, res) => {
 });
 
 
+/**
+ * @function obtenerPelicula
+ * @description Consulta información detallada sobre una película específica, incluyendo título, director, duración, estado, género y horarios de proyección.
+ * @async
+ * @method
+ * @param {Object} req - Objeto de solicitud HTTP que contiene el ID de la película en `req.params`.
+ * @param {Object} res - Objeto de respuesta HTTP para enviar la respuesta al cliente.
+ * @returns {void}
+ * @throws {Error} Lanza un error si la consulta falla o si la película no se encuentra.
+ * @response {Object} Responde con los detalles de la película solicitada, incluyendo horarios de proyección.
+ */
 exports.obtenerPelicula = handleAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -83,32 +83,6 @@ exports.obtenerPelicula = handleAsync(async (req, res) => {
       $unwind: {
         path: '$funciones',
         preserveNullAndEmptyArrays: true
-      }
-    },
-    {
-      $addFields: {
-        'funciones.fecha': {
-          $dateToString: {
-            format: '%d-%m-%Y',
-            date: '$funciones.fecha'
-          }
-        }
-      }
-    },
-    {
-      $project: {
-        _id: 1,
-        titulo: 1,
-        director: 1,
-        duracion: 1,
-        sinopsis: 1,
-        estado: 1,
-        genero: 1,
-        funciones: {
-          _id: 1,
-          fecha: 1,
-          hora: 1
-        }
       }
     },
     {
