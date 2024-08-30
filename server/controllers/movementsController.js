@@ -1,10 +1,11 @@
 const Movement = require('../models/movementsModel');
+const Payment = require('../models/paymentsModel');
 const Showing = require('../models/showingsModel');
 
 // Controlador para guardar un nuevo movimiento (compra de boletos)
 const createMovement = async (req, res) => {
     try {
-        const { showingId, seats } = req.body;
+        const { showingId, seats, paymentMethod } = req.body;
 
         // Validar que los asientos solicitados están disponibles
         const showing = await Showing.findById(showingId);
@@ -39,7 +40,16 @@ const createMovement = async (req, res) => {
 
         await newMovement.save();
 
-        res.status(201).json({ message: 'Compra realizada con éxito', movement: newMovement });
+        // Crear el pago automáticamente con el estado 'pending'
+        const newPayment = new Payment({
+            movement: newMovement._id,
+            paymentMethod: paymentMethod || 'credit_card', // Usa 'credit_card' como valor por defecto si no se proporciona un método
+            status: 'pending'
+        });
+
+        await newPayment.save();
+
+        res.status(201).json({ message: 'Compra realizada con éxito, pago pendiente', movement: newMovement, payment: newPayment });
     } catch (error) {
         console.error('Error al crear el movimiento:', error);
         res.status(500).json({ message: 'Error en el servidor' });
