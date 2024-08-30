@@ -3,6 +3,37 @@
 ## Base URL
 http://localhost:5000/
 
+## Login
+### Autenticacion: Login de usuario
+- **Método:** `POST`
+- **Endpoint:** `/auth/login`
+- **Descripción:** Autentica al usuario y genera un token JWT
+- **Body:**
+```json
+{
+  "email": "usuario@example.com",
+  "contrasena": "password123"
+}
+```
+#### Respuesta Exitosa (200):
+
+```json
+{
+  "token": "jwt_token_aquí"
+}
+```
+####  Bad Request (400):
+```json
+{
+  "message": "Faltan credenciales"
+}
+```
+####  Unauthorized (401):
+```json
+{
+  "message": "Faltan credenciales"
+}
+```
 
 ## Selección de Películas
 
