@@ -1,7 +1,20 @@
 const Payment = require('../models/paymentsModel');
 const Movement = require('../models/movementsModel');
 
-// Actualiza el estado del pago y crea un nuevo movimiento según el estado del pago
+/**
+ * Actualiza el estado de un pago y crea un nuevo movimiento basado en el estado actualizado del pago.
+ * El nuevo movimiento refleja el estado actualizado del pago, siendo 'purchased' si el pago es aceptado
+ * y 'cancelled' si el pago es rechazado o cancelado. Se utiliza el estado del pago para determinar el
+ * estado del nuevo movimiento.
+ *
+ * @param {Object} req - La solicitud HTTP. Contiene:
+ *  - {String} req.params.paymentId - El ID del pago que se va a actualizar.
+ *  - {String} req.body.status - El nuevo estado del pago. Debe ser uno de los siguientes valores: 'accepted', 'rejected', 'cancelled'.
+ * @param {Object} res - La respuesta HTTP.
+ * @returns {Promise<void>}
+ * @throws {Object} 404 - Si el pago especificado no se encuentra en la base de datos.
+ * @throws {Object} 500 - Si ocurre un error en el servidor durante el proceso de actualización.
+ */
 const updatePaymentStatus = async (req, res) => {
     try {
         const { paymentId } = req.params;
