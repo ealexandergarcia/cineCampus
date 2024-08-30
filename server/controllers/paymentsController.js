@@ -1,5 +1,6 @@
 const Payment = require('../models/paymentsModel');
 const Movement = require('../models/movementsModel');
+const Showing = require('../models/showingsModel');
 
 /**
  * Actualiza el estado de un pago y crea un nuevo movimiento basado en el estado actualizado del pago.
@@ -33,6 +34,20 @@ const updatePaymentStatus = async (req, res) => {
             newMovementStatus = 'purchased';
         } else if (status === 'rejected' || status === 'cancelled') {
             newMovementStatus = 'cancelled';
+            
+            // Restablece la disponibilidad de los asientos en la función asociada
+            const showing = await Showing.findById(payment.movement.showing);
+            if (!showing) {
+                return res.status(404).json({ message: 'Función no encontrada' });
+            }
+
+            showing.availableSeats.forEach(seat => {
+                if (payment.movement.seats.includes(seat.name)) {
+                    seat.available = true;
+                }
+            });
+
+            await showing.save();
         }
 
         // Crea un nuevo movimiento con el nuevo estado
