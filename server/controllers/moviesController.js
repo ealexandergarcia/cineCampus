@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Pelicula = require('../models/moviesModel');
-const Funcion = require('../models/functionsModel');
+const Funcion = require('../models/showingsModel');
 const { handleAsync } = require('../utils/handleAsync');
 
 
