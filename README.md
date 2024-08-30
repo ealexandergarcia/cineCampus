@@ -35,9 +35,9 @@ http://localhost:5000/
 }
 ```
 
-## Selección de Películas
+## 1. Selección de Películas
 
-### 1. API para Listar Películas
+### 1.1 API para Listar Películas
 
 - **Método:** `GET`
 - **Endpoint:** `movies/v1`
@@ -79,7 +79,7 @@ http://localhost:5000/
 #### Errores Comunes:
 - **500 Internal Server Error:** Error interno del servidor.
 
-### 2. API para Obtener Detalles de Película
+### 1.2 API para Obtener Detalles de Película
 
 - **Método:** `GET`
 - **Endpoint:** `movies/v1/:id`
@@ -106,3 +106,138 @@ http://localhost:5000/
 #### Errores Comunes:
 - **404 Not Found:** La película con el id especificado no fue encontrada.
 - **500 Internal Server Error:** Error interno del servidor.
+
+
+
+## 2. Compra de Boletos
+
+### 2.1 API para Comprar Boletos:
+ 
+- **Método:** `POST`
+- **Endpoint:** `movements/v1/purchase`
+- **Descripción:** Crea un nuevo movimiento para la compra de boletos, adenas de generar de manera automatica un proceso de pago
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** Requiere token JWT en el encabezado.
+  - Authorization: Bearer <tu_jwt_token>
+
+
+#### Body:
+```json
+{
+  "showingId": "ObjectId_de_la_función",
+  "seats": ["A1", "A2"]
+}
+```
+#### Respuestas
+- **Movimiento creado exitosamente (201)** 
+  ```json
+  {
+    "message": "Compra realizada con éxito",
+    "movement": {
+      "_id": "ObjectId_del_movimiento",
+      "user": "ObjectId_del_usuario",
+      "showing": "ObjectId_de_la_función",
+      "seats": ["A1", "A2"],
+      "status": "pending"
+    }
+  }
+  ```
+- **Función no encontrada (404)** 
+  ```json
+  {
+    "message": "Función no encontrada"
+  }
+  ```
+- **Alguno(s) de los asientos no están disponibles. (400)** 
+  ```json
+  {
+    "message": "Asientos no disponibles: A1"
+  }
+  ```
+### Actualizar el Estado del Pago:
+ 
+- **Método:** `PUT`
+- **Endpoint:** `/payments/:paymentId/status`
+- **Descripción:** Actualiza el estado del pago y genera un nuevo movimiento con base en el estado del pago.
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** Requiere token JWT en el encabezado.
+  - Authorization: Bearer <tu_jwt_token>
+
+
+#### Body:
+```json
+{
+  "status": "accepted",  // puede ser 'accepted', 'cancelled' o 'rejected'
+  "paymentMethod": "credit_card"  // puede ser 'credit_card', 'debit_card' o 'paypal'
+}
+```
+#### Respuestas
+- **Estado del pago actualizado y movimiento generado (200)** 
+  ```json
+  {
+    "message": "Estado del pago actualizado",
+    "newMovement": {
+      "_id": "ObjectId_del_nuevo_movimiento",
+      "user": "ObjectId_del_usuario",
+      "showing": "ObjectId_de_la_función",
+      "seats": ["A1", "A2"],
+      "status": "purchased"  // según el estado del pago
+    }
+  }
+  ```
+- **Estado o método de pago inválido (400)** 
+  ```json
+  {
+    "message": "Estado o método de pago inválido"
+  }
+  ```
+- **Pago no encontrado (404)** 
+  ```json
+  {
+    "message": "Pago no encontrado"
+  }
+  ```
+
+
+
+### 2.2 API para Verificar Disponibilidad de Asientos
+
+- **Método:** `GET`
+- **Endpoint:** `/showings/:id/availability`
+- **Descripción:** Consulta la disponibilidad de asientos para una función específica.
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** Requiere token JWT en el encabezado.
+  - Authorization: Bearer <tu_jwt_token>
+
+#### Respuestas
+- **Devuelve los asientos disponibles para la función (200)** 
+
+  ```json
+  {
+    "showingId": "ObjectId_de_la_función",
+    "date": "2024-08-30T00:00:00.000Z",
+    "seats": [
+      {
+        "name": "A1",
+        "price": 15,
+        "type": "VIP"
+      },
+      {
+        "name": "A2",
+        "price": 15,
+        "type": "VIP"
+      },
+      {
+        "name": "B1",
+        "price": 10,
+        "type": "Regular"
+      }
+    ]
+  }
+  ```
+- **Pago no encontrado (404)** 
+  ```json
+  {
+    "message": "Funcion no encontrado"
+  }
+  ```
