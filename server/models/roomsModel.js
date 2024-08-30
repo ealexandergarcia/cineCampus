@@ -1,33 +1,15 @@
+// models/roomsModel.js
 const mongoose = require('mongoose');
 
-const asientoSchema = new mongoose.Schema({
-  numero: {
-    type: String,
-    required: true,
-  },
-  tipo: {
-    type: String,
-    enum: ['VIP', 'Regular'],
-    required: true,
-  },
-  disponible: {
-    type: Boolean,
-    default: true,
-  },
-});
-
 const roomSchema = new mongoose.Schema({
-  nombre: {
+  name: {
     type: String,
-    required: true,
+    required: true
   },
-  precio: {
-    type: [Number], // Array de precios para diferentes tipos de asientos o sesiones
-    required: true,
-  },
-  asientos: [asientoSchema], // Array de asientos con sus características
+  price: {
+    type: [Number],
+    required: true
+  }
 });
 
-const Room = mongoose.model('Room', roomSchema);
-
-module.exports = Room;
+module.exports = mongoose.model('Room', roomSchema);
