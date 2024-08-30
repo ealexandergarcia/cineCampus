@@ -1,7 +1,7 @@
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/userModel'); // Ajusta según la ruta de tu modelo User
+const User = require('../models/usersModel'); // Ajusta la ruta según tu estructura
 
 // Configuración de Passport para JWT
 const opts = {
@@ -25,7 +25,7 @@ passport.use(new JwtStrategy(opts, async (jwt_payload, done) => {
 function authenticate(req, res, next) {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) {
-      return res.status(401).json({ mensaje: 'No autorizado' });
+      return res.status(401).json({ message: 'Not authorized' });
     }
     req.user = user;
     next();

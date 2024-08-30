@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel'); // Ajusta la ruta según tu estructura
+const User = require('../models/usersModel'); // Ajusta la ruta según tu estructura
 
 // Inicia sesión de usuario
 const loginUser = async (req, res) => {
-    const { email, contrasena } = req.body; // Cambia 'password' a 'contrasena'
+    const { email, contrasena } = req.body;
 
     if (!email || !contrasena) {
         return res.status(400).json({ message: 'Faltan credenciales' });
@@ -18,7 +18,7 @@ const loginUser = async (req, res) => {
         }
 
         // Comparar contraseñas
-        if (user.contrasena !== contrasena) { // Cambia 'password' a 'contrasena'
+        if (user.password !== contrasena) { // Cambia 'contrasena' a 'password'
             return res.status(401).json({ message: 'Contraseña incorrecta' });
         }
 

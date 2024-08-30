@@ -34,8 +34,7 @@ const createMovement = async (req, res) => {
         const newMovement = new Movement({
             user: req.user._id,
             showing: showingId,
-            seats: seats,
-            status: 'confirmed'
+            seats: seats
         });
 
         await newMovement.save();
