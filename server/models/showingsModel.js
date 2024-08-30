@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const functionSchema = new mongoose.Schema({
+const showingSchema = new mongoose.Schema({
   movie: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Movie',
@@ -18,9 +18,28 @@ const functionSchema = new mongoose.Schema({
   time: {
     type: String,
     required: true
-  }
+  },
+  availableSeats: [
+    {
+      name: {
+        type: String,
+        required: true
+      },
+      price: {
+        type: Number,
+        required: true
+      },
+      type: {
+        type: String,
+        enum: ['VIP', 'Regular'],
+        required: true
+      },
+      available: {
+        type: Boolean,
+        default: true
+      }
+    }
+  ]
 });
 
-const Function = mongoose.model('Function', functionSchema);
-
-module.exports = Function;
+module.exports = mongoose.model('Showing', showingSchema);
