@@ -7,6 +7,7 @@ const moviesRoutes = require('./server/routes/moviesRoutes'); // Importa las rut
 const showingsRouter = require('./server/routes/showingsRouter');
 const authRoutes = require('./server/routes/authRoutes');
 const movementsRoutes = require('./server/routes/movementsRouter');
+const paymentsRouter = require('./server/routes/paymentsRouter');
 
 
 
@@ -21,7 +22,7 @@ app.use('/movies', moviesRoutes); // Usa las rutas de películas en la API
 app.use('/showings', showingsRouter);
 app.use('/auth', authRoutes);
 app.use('/movements', movementsRoutes);
-
+app.use('/payments', paymentsRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
