@@ -9,7 +9,7 @@ http://localhost:5000/
 ### 1. API para Listar Películas
 
 - **Método:** `GET`
-- **Endpoint:** `peliculas/v1`
+- **Endpoint:** `movies/v1`
 - **Descripción:** Obtiene una lista de todas las películas disponibles en el catálogo, junto con sus géneros, duración y horarios de proyección a partir de la fecha actual.
 
 #### Respuesta Exitosa (200):
@@ -51,7 +51,7 @@ http://localhost:5000/
 ### 2. API para Obtener Detalles de Película
 
 - **Método:** `GET`
-- **Endpoint:** `peliculas/v1/:id`
+- **Endpoint:** `movies/v1/:id`
 - **Descripción:** Obtiene los detalles completos de una película específica según su id, incluyendo sinopsis y horarios de proyección.
 
 #### Parámetros de Ruta:
