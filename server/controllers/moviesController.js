@@ -51,6 +51,26 @@ const getMovies = async (req, res) => {
     }
 };
 
+const getMovieDetails = async (req, res) => {
+    try {
+        const movieId = req.params.id;  // Obtener el ID de la película desde los parámetros de la solicitud
+
+        // Buscar la película por su ID
+        const movie = await Movie.findById(movieId);
+
+        // Verificar si se encontró la película
+        if (!movie) {
+            return res.status(404).json({ message: 'Movie not found' });
+        }
+
+        // Enviar los detalles de la película en la respuesta
+        res.status(200).json(movie);
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving movie details' });
+    }
+};
+
 module.exports = {
-    getMovies
+    getMovies,
+    getMovieDetails
 };
