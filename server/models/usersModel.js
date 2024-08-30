@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    nombre: {
+    name: {
         type: String,
         required: true
     },
@@ -10,17 +10,21 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    contrasena: {
+    password: {
         type: String,
         required: true
     },
-    rol: {
+    phone: {
         type: String,
         required: true
     },
-    tarjeta: {
+    role: {
+        type: String,
+        required: true
+    },
+    card: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Tarjeta' // Cambia esto si es necesario según tu esquema de tarjetas
+        ref: 'Card' // Cambia esto si es necesario según tu esquema de tarjetas
     }
 });
 
