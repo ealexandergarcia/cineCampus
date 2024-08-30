@@ -14,7 +14,7 @@ app.use(express.json());
 Database.getInstance(); // Llama para inicializar la conexión
 
 app.use(bodyParser.json());
-app.use('/peliculas', moviesRoutes); // Usa las rutas de películas en la API
+app.use('/movies', moviesRoutes); // Usa las rutas de películas en la API
 
 
 const PORT = process.env.PORT || 5000;

@@ -1,10 +1,18 @@
-const Movie = require('../models/moviesModel');
-const Function = require('../models/showingsModel');
+const Movie = require('../models/moviesModel'); // Modelo de película
+const Showtime = require('../models/showingsModel'); // Modelo de horarios
 
+/**
+ * Obtiene una lista de todas las películas disponibles en el catálogo,
+ * junto con sus géneros, duración y horarios de proyección.
+ * Solo se incluyen películas que tienen funciones a partir de la fecha actual.
+ *
+ * @param {Object} req - La solicitud HTTP.
+ * @param {Object} res - La respuesta HTTP.
+ * @returns {Promise<void>}
+ */
 const getMovies = async (req, res) => {
     try {
-        const currentDate = new Date().toISOString().split('T')[0];
-        
+        const today = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
         const movies = await Movie.aggregate([
             {
                 $lookup: {
@@ -17,16 +25,12 @@ const getMovies = async (req, res) => {
             {
                 $unwind: {
                     path: '$showings',
-                    preserveNullAndEmptyArrays: true
+                    preserveNullAndEmptyArrays: false
                 }
             },
             {
                 $match: {
-                    $expr: {
-                        $and: [
-                            { $gte: [{ $ifNull: ['$showings.date', ''] }, currentDate] }
-                        ]
-                    }
+                    'showings.date': { $gte: today }
                 }
             },
             {
@@ -47,23 +51,28 @@ const getMovies = async (req, res) => {
 
         res.status(200).json(movies);
     } catch (error) {
-        res.status(500).json({ mensaje: 'Error retrieving movies' });
+        res.status(500).json({ message: 'Error retrieving movies' });
     }
 };
 
+/**
+ * Obtiene los detalles completos de una película específica según su id,
+ * incluyendo la sinopsis.
+ *
+ * @param {Object} req - La solicitud HTTP.
+ * @param {Object} res - La respuesta HTTP.
+ * @returns {Promise<void>}
+ */
 const getMovieDetails = async (req, res) => {
     try {
-        const movieId = req.params.id;  // Obtener el ID de la película desde los parámetros de la solicitud
+        const { id } = req.params;
 
-        // Buscar la película por su ID
-        const movie = await Movie.findById(movieId);
+        const movie = await Movie.findById(id);
 
-        // Verificar si se encontró la película
         if (!movie) {
             return res.status(404).json({ message: 'Movie not found' });
         }
 
-        // Enviar los detalles de la película en la respuesta
         res.status(200).json(movie);
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving movie details' });
