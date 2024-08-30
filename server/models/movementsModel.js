@@ -17,7 +17,7 @@ const movementSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'confirmed', 'cancelled'],
+        enum: ['pending', 'purchased', 'cancelled','rejected','reserved'],
         default: 'pending'
     }
 }, { timestamps: true });
