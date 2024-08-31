@@ -3,39 +3,70 @@ const Movement = require('../models/movementsModel');
 const Showing = require('../models/showingsModel');
 
 /**
- * Actualiza el estado de un pago y crea un nuevo movimiento basado en el estado actualizado del pago.
- * El nuevo movimiento refleja el estado actualizado del pago, siendo 'purchased' si el pago es aceptado
- * y 'cancelled' si el pago es rechazado o cancelado. Se utiliza el estado del pago para determinar el
- * estado del nuevo movimiento.
+ * Inicia el proceso de pago para una reserva.
+ * Crea un registro en la colección de pagos con estado 'pending'.
  *
  * @param {Object} req - La solicitud HTTP. Contiene:
- *  - {String} req.params.paymentId - El ID del pago que se va a actualizar.
- *  - {String} req.body.status - El nuevo estado del pago. Debe ser uno de los siguientes valores: 'accepted', 'rejected', 'cancelled'.
+ *  - {String} req.params.reservationId - El ID del movimiento de reserva.
+ *  - {String} req.body.paymentMethod - El método de pago (opcional).
  * @param {Object} res - La respuesta HTTP.
  * @returns {Promise<void>}
- * @throws {Object} 404 - Si el pago especificado no se encuentra en la base de datos.
- * @throws {Object} 500 - Si ocurre un error en el servidor durante el proceso de actualización.
+ */
+const initiateReservationPayment = async (req, res) => {
+    try {
+        const { reservationId } = req.params;
+        const { paymentMethod } = req.body;
+
+        const reservation = await Movement.findById(reservationId);
+
+        if (!reservation || reservation.status !== 'reserved') {
+            return res.status(404).json({ message: 'Reserva no encontrada o ya procesada' });
+        }
+
+        const newPayment = new Payment({
+            movement: reservation._id,
+            paymentMethod: paymentMethod || 'credit_card',
+            status: 'pending'
+        });
+
+        await newPayment.save();
+
+        res.status(201).json({ message: 'Proceso de pago iniciado', payment: newPayment });
+    } catch (error) {
+        console.error('Error al iniciar el pago de la reserva:', error);
+        res.status(500).json({ message: 'Error en el servidor' });
+    }
+};
+
+/**
+ * Actualiza el estado del pago y maneja la lógica de actualización de la reserva.
+ * Si el pago es 'accepted', el movimiento cambia a 'purchased'.
+ * Si es 'rejected' o 'cancelled', el movimiento cambia a 'cancelled' y los asientos se liberan.
+ *
+ * @param {Object} req - La solicitud HTTP. Contiene:
+ *  - {String} req.params.paymentId - El ID del pago.
+ *  - {String} req.body.status - El nuevo estado del pago.
+ * @param {Object} res - La respuesta HTTP.
+ * @returns {Promise<void>}
  */
 const updatePaymentStatus = async (req, res) => {
     try {
         const { paymentId } = req.params;
         const { status } = req.body;
 
-        // Actualiza el estado del pago
         const payment = await Payment.findByIdAndUpdate(paymentId, { status }, { new: true }).populate('movement');
 
         if (!payment) {
             return res.status(404).json({ message: 'Pago no encontrado' });
         }
 
-        // Determina el nuevo estado del movimiento basado en el estado del pago
         let newMovementStatus;
+
         if (status === 'accepted') {
             newMovementStatus = 'purchased';
         } else if (status === 'rejected' || status === 'cancelled') {
             newMovementStatus = 'cancelled';
-            
-            // Restablece la disponibilidad de los asientos en la función asociada
+
             const showing = await Showing.findById(payment.movement.showing);
             if (!showing) {
                 return res.status(404).json({ message: 'Función no encontrada' });
@@ -50,7 +81,6 @@ const updatePaymentStatus = async (req, res) => {
             await showing.save();
         }
 
-        // Crea un nuevo movimiento con el nuevo estado
         const newMovement = new Movement({
             user: payment.movement.user,
             showing: payment.movement.showing,
@@ -69,5 +99,6 @@ const updatePaymentStatus = async (req, res) => {
 };
 
 module.exports = {
+    initiateReservationPayment,
     updatePaymentStatus
 };
