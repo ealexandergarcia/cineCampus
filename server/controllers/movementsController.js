@@ -68,4 +68,54 @@ const createMovement = async (req, res) => {
     }
 };
 
-module.exports = { createMovement };
+
+/**
+ * Reserva de asientos: Crea un movimiento con estado 'reserved'.
+ *
+ * @param {Object} req - La solicitud HTTP. Contiene:
+ *  - {String} req.body.showingId - El ID de la función.
+ *  - {Array} req.body.seats - Lista de nombres de los asientos a reservar.
+ * @param {Object} res - La respuesta HTTP.
+ * @returns {Promise<void>}
+ */
+const reserveSeats = async (req, res) => {
+    try {
+        const { showingId, seats } = req.body;
+        const showing = await Showing.findById(showingId);
+
+        if (!showing) {
+            return res.status(404).json({ message: 'Función no encontrada' });
+        }
+
+        const unavailableSeats = seats.filter(seat =>
+            !showing.availableSeats.some(s => s.name === seat && s.available)
+        );
+
+        if (unavailableSeats.length > 0) {
+            return res.status(400).json({ message: `Asientos no disponibles: ${unavailableSeats.join(', ')}` });
+        }
+
+        showing.availableSeats.forEach(seat => {
+            if (seats.includes(seat.name)) {
+                seat.available = false;
+            }
+        });
+
+        await showing.save();
+
+        const newMovement = new Movement({
+            user: req.user._id,
+            showing: showingId,
+            seats: seats,
+            status: 'reserved'
+        });
+
+        await newMovement.save();
+
+        res.status(201).json({ message: 'Reserva realizada con éxito', movement: newMovement });
+    } catch (error) {
+        console.error('Error al reservar asientos:', error);
+        res.status(500).json({ message: 'Error en el servidor' });
+    }
+};
+module.exports = { createMovement, reserveSeats };
