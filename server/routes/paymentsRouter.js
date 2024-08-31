@@ -3,6 +3,10 @@ const router = express.Router();
 const paymentsController = require('../controllers/paymentsController');
 const authenticate = require('../middleware/authMiddleware');
 
+// Ruta para iniciar el proceso de pago de una reserva
+router.post('/:reservationId/initiate', authenticate, paymentsController.initiateReservationPayment);
+
+// Ruta para actualizar el estado del pago
 router.put('/:paymentId/status', authenticate, paymentsController.updatePaymentStatus);
 
 module.exports = router;
