@@ -109,6 +109,7 @@ http://localhost:5000/
 
 
 
+
 ## 2. Compra de Boletos
 
 ### 2.1 API para Comprar Boletos:
@@ -154,7 +155,7 @@ http://localhost:5000/
     "message": "Asientos no disponibles: A1"
   }
   ```
-### Actualizar el Estado del Pago:
+### 2.1.1 Actualizar el Estado del Pago:
  
 - **Método:** `PUT`
 - **Endpoint:** `/payments/:paymentId/status`
@@ -241,3 +242,135 @@ http://localhost:5000/
     "message": "Funcion no encontrado"
   }
   ```
+
+## 3. Asignación de Asientos
+
+### 3.1 API para Reservar Asientos:
+ 
+- **Método:** `POST`
+- **Endpoint:** `movements/v1/reservation`
+- **Descripción:** Reserva asientos para una función específica. Crea un movimiento con estado 'reserved'.
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** 
+  - Authorization: Bearer <tu_jwt_token>
+
+
+#### Body:
+```json
+{
+  "showingId": "ObjectId_de_la_función",
+  "seats": ["A1", "A2"]
+}
+```
+#### Respuestas
+- **Movimiento creado exitosamente (201)** 
+  ```json
+  {
+    "message": "Compra realizada con éxito",
+    "movement": {
+      "_id": "ObjectId_del_movimiento",
+      "user": "ObjectId_del_usuario",
+      "showing": "ObjectId_de_la_función",
+      "seats": ["A1", "A2"],
+      "status": "reserved"
+    }
+  }
+  ```
+- **Función no encontrada (404)** 
+  ```json
+  {
+    "message": "Función no encontrada"
+  }
+  ```
+- **Alguno(s) de los asientos no están disponibles. (400)** 
+  ```json
+  {
+    "message": "Asientos no disponibles: A1"
+  }
+  ```
+### 3.1.1 Iniciar Pago para una Reserva:
+ 
+- **Método:** `POST`
+- **Endpoint:** `/payments/v1/initiate/:reservationId`
+- **Descripción:** Inicia el proceso de pago para una reserva. Crea un registro de pago con estado 'pending'.
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** Requiere token JWT en el encabezado.
+  - Authorization: Bearer <tu_jwt_token>
+- **Params:**
+  - reservationId: ID del movimiento de reserva
+
+
+#### Body:
+```json
+{
+  "paymentMethod": "credit_card"
+}
+```
+#### Respuestas
+- **Proceso de pago iniciado (201)** 
+  ```json
+  {
+    "message": "Proceso de pago iniciado",
+    "payment": {
+      "movement": "ObjectId",
+      "paymentMethod": "string",
+      "status": "pending"
+    }
+  }
+  ```
+- **Estado o método de pago inválido (400)** 
+  ```json
+  {
+    "message": "Estado o método de pago inválido"
+  }
+  ```
+- **Pago no encontrado (404)** 
+  ```json
+  {
+    "message": "Reserva no encontrada o ya procesada"
+  }
+  ```
+### 3.1.2 Actualizar el Estado del Pago:
+ 
+- **Método:** `PUT`
+- **Endpoint:** `/payments/:paymentId/status`
+- **Descripción:** Actualiza el estado del pago y genera un nuevo movimiento con base en el estado del pago.
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** Requiere token JWT en el encabezado.
+  - Authorization: Bearer <tu_jwt_token>
+
+
+#### Body:
+```json
+{
+  "status": "accepted",  // puede ser 'accepted', 'cancelled' o 'rejected'
+  "paymentMethod": "credit_card"  // puede ser 'credit_card', 'debit_card' o 'paypal'
+}
+```
+#### Respuestas
+- **Estado del pago actualizado y movimiento generado (200)** 
+  ```json
+  {
+    "message": "Estado del pago actualizado",
+    "newMovement": {
+      "_id": "ObjectId_del_nuevo_movimiento",
+      "user": "ObjectId_del_usuario",
+      "showing": "ObjectId_de_la_función",
+      "seats": ["A1", "A2"],
+      "status": "purchased"  // según el estado del pago
+    }
+  }
+  ```
+- **Estado o método de pago inválido (400)** 
+  ```json
+  {
+    "message": "Estado o método de pago inválido"
+  }
+  ```
+- **Pago no encontrado (404)** 
+  ```json
+  {
+    "message": "Pago no encontrado"
+  }
+  ```
+
