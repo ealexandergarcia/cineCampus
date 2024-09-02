@@ -7,7 +7,7 @@ const roomSchema = new mongoose.Schema({
     required: true
   },
   price: {
-    type: [Number],
+    type: Number,
     required: true
   }
 });
