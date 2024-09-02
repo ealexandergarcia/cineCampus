@@ -26,14 +26,16 @@ const initiateReservationPayment = async (req, res) => {
 
         const showing = await Showing.findById(reservation.showing);
         const room = await Room.findById(showing.room);
-        const user = await User.findById(req.user._id).populate('card');
+        const user = await User.findById(req.user._id).populate('card'); // Asegúrate de incluir el campo card
 
         if (!showing) {
             return res.status(404).json({ message: 'Función no encontrada' });
         }
 
+        // Verifica si el usuario tiene una tarjeta VIP
         const card = user.card;
         const currentDate = new Date();
+
         let totalAmount = 0;
 
         showing.availableSeats.forEach(seat => {
@@ -42,25 +44,40 @@ const initiateReservationPayment = async (req, res) => {
             }
         });
 
-        let discountedAmount;
+        const totalAmountWithRoom = room.price + totalAmount;
+
+        // Verifica si la tarjeta es válida
         if (card && card.validity >= currentDate) {
+            // Tarjeta válida, se aplica el descuento
             const discount = card.discount;
-            discountedAmount = totalAmount - (totalAmount * discount / 100);
+            const discountedAmount = totalAmountWithRoom - ((totalAmountWithRoom) * discount / 100);
+
+            const newPayment = new Payment({
+                movement: reservation._id,
+                paymentMethod: paymentMethod || 'credit_card',
+                amount: discountedAmount,
+                discount: card.discount,
+                status: 'pending'
+            });
+
+            await newPayment.save();
+
+            res.status(201).json({ message: 'Proceso de pago iniciado', payment: newPayment });
         } else {
-            discountedAmount = totalAmount;
+            // Usuario no tiene tarjeta VIP o la tarjeta no es válida
+            const newPayment = new Payment({
+                movement: reservation._id,
+                paymentMethod: paymentMethod || 'credit_card',
+                amount: totalAmountWithRoom,
+                discount: null, // Sin descuento
+                status: 'pending'
+            });
+
+            await newPayment.save();
+
+            res.status(201).json({ message: 'Proceso de pago iniciado', payment: newPayment });
         }
 
-        const newPayment = new Payment({
-            movement: reservation._id,
-            paymentMethod: paymentMethod || 'credit_card',
-            amount: discountedAmount,
-            discount: card ? card.discount : null,
-            status: 'pending'
-        });
-
-        await newPayment.save();
-
-        res.status(201).json({ message: 'Proceso de pago iniciado', payment: newPayment });
     } catch (error) {
         console.error('Error al iniciar el pago de la reserva:', error);
         res.status(500).json({ message: 'Error en el servidor' });
