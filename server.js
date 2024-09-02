@@ -24,7 +24,7 @@ app.use('/showings', showingsRouter);
 app.use('/auth', authRoutes);
 app.use('/movements', movementsRoutes);
 app.use('/payments', paymentsRouter);
-app.use('/ss', cardsRoutes);
+app.use('/card', cardsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
