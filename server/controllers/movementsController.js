@@ -24,7 +24,6 @@ const createMovement = async (req, res) => {
         const { showingId, seats, paymentMethod } = req.body;
 
         const showing = await Showing.findById(showingId);
-
         if (!showing) {
             return res.status(404).json({ message: 'Función no encontrada' });
         }
@@ -53,9 +52,16 @@ const createMovement = async (req, res) => {
 
         await newMovement.save();
 
+        const totalAmount = showing.price + seats.length * showing.seatPrice;
+        const userCard = await Card.findOne({ user: req.user._id, validity: { $gte: new Date() } });
+        const discount = userCard ? userCard.discount : 0;
+        const discountedAmount = totalAmount - (totalAmount * discount / 100);
+
         const newPayment = new Payment({
             movement: newMovement._id,
             paymentMethod: paymentMethod || 'credit_card',
+            amount: discountedAmount,
+            discount: userCard ? userCard._id : null,
             status: 'pending'
         });
 

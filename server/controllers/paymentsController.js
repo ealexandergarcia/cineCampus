@@ -1,10 +1,11 @@
 const Payment = require('../models/paymentsModel');
 const Movement = require('../models/movementsModel');
 const Showing = require('../models/showingsModel');
+const Card = require('../models/cardsModel'); // Asegúrate de tener este modelo
 
 /**
  * Inicia el proceso de pago para una reserva.
- * Crea un registro en la colección de pagos con estado 'pending'.
+ * Crea un registro en la colección de pagos con estado 'pending' y calcula el monto y descuento aplicable.
  *
  * @param {Object} req - La solicitud HTTP. Contiene:
  *  - {String} req.params.reservationId - El ID del movimiento de reserva.
@@ -18,15 +19,27 @@ const initiateReservationPayment = async (req, res) => {
         const { paymentMethod } = req.body;
 
         const reservation = await Movement.findById(reservationId);
-
         if (!reservation || reservation.status !== 'reserved') {
             return res.status(404).json({ message: 'Reserva no encontrada o ya procesada' });
         }
 
+        const showing = await Showing.findById(reservation.showing);
+        if (!showing) {
+            return res.status(404).json({ message: 'Función no encontrada' });
+        }
+
+        const totalAmount = showing.price + reservation.seats.length * showing.seatPrice;
+
+        // Verifica si el usuario tiene una tarjeta VIP
+        const userCard = await Card.findOne({ user: req.user._id, validity: { $gte: new Date() } });
+        const discount = userCard ? userCard.discount : 0;
+        const discountedAmount = totalAmount - (totalAmount * discount / 100);
+
         const newPayment = new Payment({
             movement: reservation._id,
             paymentMethod: paymentMethod || 'credit_card',
-            status: 'pending'
+            amount: discountedAmount,
+            discount: userCard ? userCard._id : null
         });
 
         await newPayment.save();
@@ -54,8 +67,7 @@ const updatePaymentStatus = async (req, res) => {
         const { paymentId } = req.params;
         const { status } = req.body;
 
-        const payment = await Payment.findByIdAndUpdate(paymentId, { status }, { new: true }).populate('movement');
-
+        const payment = await Payment.findById(paymentId).populate('movement');
         if (!payment) {
             return res.status(404).json({ message: 'Pago no encontrado' });
         }
