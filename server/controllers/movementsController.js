@@ -1,6 +1,9 @@
 const Movement = require('../models/movementsModel');
 const Payment = require('../models/paymentsModel');
 const Showing = require('../models/showingsModel');
+const Card = require('../models/cardsModel');
+const Room = require('../models/roomsModel');
+const User = require('../models/usersModel');
 
 /**
  * Crea un nuevo movimiento que representa la compra de boletos por parte de un usuario.
@@ -18,33 +21,57 @@ const Showing = require('../models/showingsModel');
  * @throws {Object} 404 - Si no se encuentra la función especificada.
  * @throws {Object} 400 - Si alguno de los asientos solicitados no está disponible.
  * @throws {Object} 500 - Si ocurre un error en el servidor.
- */
+*/
 const createMovement = async (req, res) => {
     try {
         const { showingId, seats, paymentMethod } = req.body;
 
         const showing = await Showing.findById(showingId);
+        const room = await Room.findById(showing.room);
+        const user = await User.findById(req.user._id).populate('card'); // Asegúrate de incluir el campo card
 
         if (!showing) {
             return res.status(404).json({ message: 'Función no encontrada' });
         }
 
-        const unavailableSeats = seats.filter(seat =>
-            !showing.availableSeats.some(s => s.name === seat && s.available)
-        );
+        // Verifica si todos los asientos solicitados están disponibles
+        const unavailableSeats = [];
+        showing.availableSeats.forEach(seat => {
+            if (seats.includes(seat.name) && !seat.available) {
+                unavailableSeats.push(seat.name);
+            }
+        });
 
         if (unavailableSeats.length > 0) {
-            return res.status(400).json({ message: `Asientos no disponibles: ${unavailableSeats.join(', ')}` });
+            return res.status(400).json({ 
+                message: `Asientos no disponibles: ${unavailableSeats.join(', ')}`
+            });
         }
 
+        // Calcula el monto total y actualiza el estado de los asientos a no disponibles
+        let totalAmount = 0;
         showing.availableSeats.forEach(seat => {
             if (seats.includes(seat.name)) {
                 seat.available = false;
+                totalAmount += seat.price;
             }
         });
 
         await showing.save();
 
+        // Verifica si el usuario tiene una tarjeta VIP válida
+        const card = user.card;
+        const currentDate = new Date();
+
+        let finalAmount = room.price + totalAmount;
+        let discount = null;
+
+        if (card && card.validity >= currentDate) {
+            discount = card.discount;
+            finalAmount -= finalAmount * discount / 100;
+        }
+
+        // Crea el movimiento
         const newMovement = new Movement({
             user: req.user._id,
             showing: showingId,
@@ -53,20 +80,32 @@ const createMovement = async (req, res) => {
 
         await newMovement.save();
 
+        // Crea el pago
         const newPayment = new Payment({
             movement: newMovement._id,
             paymentMethod: paymentMethod || 'credit_card',
+            amount: finalAmount,
+            discount: discount,
             status: 'pending'
         });
 
         await newPayment.save();
 
-        res.status(201).json({ message: 'Compra realizada con éxito, pago pendiente', movement: newMovement, payment: newPayment });
+        res.status(201).json({ 
+            message: 'Compra realizada con éxito, pago pendiente', 
+            movement: newMovement, 
+            payment: newPayment 
+        });
+
     } catch (error) {
         console.error('Error al crear el movimiento:', error);
         res.status(500).json({ message: 'Error en el servidor' });
     }
 };
+
+
+
+
 
 
 /**

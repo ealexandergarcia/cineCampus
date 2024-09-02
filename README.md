@@ -413,3 +413,56 @@ http://localhost:5000/
       "message": "No se puede cancelar una reserva con un pago asociado"
   }
   ```
+
+  
+## 4. Descuentos y Tarjetas VIP
+
+### 4.1 API para Aplicar Descuentos:
+ 
+- **Descripción:** Esta API se encarga de iniciar el proceso de pago para una reserva de asientos, gestionando de forma interna la aplicación de descuentos si el usuario tiene una tarjeta VIP válida. El proceso de validación del descuento está integrado en la lógica de creación del pago y no requiere una API intermedia separada para verificar la validez de la tarjeta.
+
+
+
+#### Proceso Interno de Validación y Aplicación de Descuentos::
+1. **Cálculo del Monto Total:** Se determina el monto total a pagar sumando el valor de la sala y el valor de cada uno de los asientos reservados.
+2. **Verificación de Tarjeta VIP:** Se verifica si el usuario tiene una tarjeta VIP
+3. **Aplicación del Descuento:** 
+- La validación de la tarjeta VIP se realiza como parte del proceso de creación del pago. Se busca la tarjeta VIP asociada al usuario y se verifica su validez. La validez de la tarjeta se determina comparando su fecha de vencimiento con la fecha actual.
+- Si el usuario tiene una tarjeta VIP válida, se calcula el descuento aplicable y se ajusta el monto total. Si no hay una tarjeta válida, el monto total permanece sin descuento.
+4. **Creación del Pago**:
+Se genera un nuevo registro de pago con el monto total ajustado y el descuento aplicado (si corresponde). El estado del pago se establece inicialmente como 'pending'.
+
+### 4.2 API para Verificar Tarjeta VIP:
+ 
+- **Método:** `GET`
+- **Endpoint:** `/card/v1/verify`
+- **Descripción:** Verifica el estado de la tarjeta VIP del usuario autenticado. Proporciona información sobre si la tarjeta está activa, ha expirado, o si el usuario no tiene tarjeta VIP.
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** 
+  - Authorization: Bearer <tu_jwt_token>
+
+#### Respuestas
+- **Tarjeta VIP activa (200)** 
+  ```json
+  {
+    "message": "Tu tarjeta VIP está activa y tiene un descuento del 15%."
+  }
+  ```
+- **Tarjeta VIP expiró (400)** 
+  ```json
+  {
+    "message": "Tu tarjeta VIP ha expirado. La tarjeta caducó el 2023-01-01. Por favor, renueva tu tarjeta para seguir disfrutando de los beneficios."
+  }
+  ```
+- **Usuario no tiene tarjeta VIP (404)** 
+  ```json
+  {
+  "message": "Este usuario no cuenta con una tarjeta VIP. Te invitamos a adquirir una para obtener descuentos."
+  }
+  ```
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error en el servidor al verificar la tarjeta VIP."
+  }
+  ```

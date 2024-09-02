@@ -25,6 +25,14 @@ const paymentsSchema = new mongoose.Schema({
         type: String,
         enum: ['pending','accepted', 'cancelled', 'rejected'],
         default: 'pending'
+    },
+    amount: { 
+        type: Number, 
+        required: true 
+    },
+    discount: { 
+        type: Number, 
+        default: 0 
     }
 }, { timestamps: true });
 

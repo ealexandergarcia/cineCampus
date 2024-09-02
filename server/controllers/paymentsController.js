@@ -1,10 +1,12 @@
 const Payment = require('../models/paymentsModel');
 const Movement = require('../models/movementsModel');
 const Showing = require('../models/showingsModel');
-
+const Card = require('../models/cardsModel'); // Asegúrate de tener este modelo
+const Room = require('../models/roomsModel');
+const User = require('../models/usersModel');
 /**
  * Inicia el proceso de pago para una reserva.
- * Crea un registro en la colección de pagos con estado 'pending'.
+ * Crea un registro en la colección de pagos con estado 'pending' y calcula el monto y descuento aplicable.
  *
  * @param {Object} req - La solicitud HTTP. Contiene:
  *  - {String} req.params.reservationId - El ID del movimiento de reserva.
@@ -18,25 +20,70 @@ const initiateReservationPayment = async (req, res) => {
         const { paymentMethod } = req.body;
 
         const reservation = await Movement.findById(reservationId);
-
         if (!reservation || reservation.status !== 'reserved') {
             return res.status(404).json({ message: 'Reserva no encontrada o ya procesada' });
         }
 
-        const newPayment = new Payment({
-            movement: reservation._id,
-            paymentMethod: paymentMethod || 'credit_card',
-            status: 'pending'
+        const showing = await Showing.findById(reservation.showing);
+        const room = await Room.findById(showing.room);
+        const user = await User.findById(req.user._id).populate('card'); // Asegúrate de incluir el campo card
+
+        if (!showing) {
+            return res.status(404).json({ message: 'Función no encontrada' });
+        }
+
+        // Verifica si el usuario tiene una tarjeta VIP
+        const card = user.card;
+        const currentDate = new Date();
+
+        let totalAmount = 0;
+
+        showing.availableSeats.forEach(seat => {
+            if (reservation.seats.includes(seat.name)) {
+                totalAmount += seat.price;
+            }
         });
 
-        await newPayment.save();
+        const totalAmountWithRoom = room.price + totalAmount;
 
-        res.status(201).json({ message: 'Proceso de pago iniciado', payment: newPayment });
+        // Verifica si la tarjeta es válida
+        if (card && card.validity >= currentDate) {
+            // Tarjeta válida, se aplica el descuento
+            const discount = card.discount;
+            const discountedAmount = totalAmountWithRoom - ((totalAmountWithRoom) * discount / 100);
+
+            const newPayment = new Payment({
+                movement: reservation._id,
+                paymentMethod: paymentMethod || 'credit_card',
+                amount: discountedAmount,
+                discount: card.discount,
+                status: 'pending'
+            });
+
+            await newPayment.save();
+
+            res.status(201).json({ message: 'Proceso de pago iniciado', payment: newPayment });
+        } else {
+            // Usuario no tiene tarjeta VIP o la tarjeta no es válida
+            const newPayment = new Payment({
+                movement: reservation._id,
+                paymentMethod: paymentMethod || 'credit_card',
+                amount: totalAmountWithRoom,
+                discount: null, // Sin descuento
+                status: 'pending'
+            });
+
+            await newPayment.save();
+
+            res.status(201).json({ message: 'Proceso de pago iniciado', payment: newPayment });
+        }
+
     } catch (error) {
         console.error('Error al iniciar el pago de la reserva:', error);
         res.status(500).json({ message: 'Error en el servidor' });
     }
 };
+
 
 /**
  * Actualiza el estado del pago y maneja la lógica de actualización de la reserva.
@@ -54,8 +101,7 @@ const updatePaymentStatus = async (req, res) => {
         const { paymentId } = req.params;
         const { status } = req.body;
 
-        const payment = await Payment.findByIdAndUpdate(paymentId, { status }, { new: true }).populate('movement');
-
+        const payment = await Payment.findById(paymentId).populate('movement');
         if (!payment) {
             return res.status(404).json({ message: 'Pago no encontrado' });
         }
