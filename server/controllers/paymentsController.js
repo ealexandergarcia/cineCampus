@@ -2,7 +2,8 @@ const Payment = require('../models/paymentsModel');
 const Movement = require('../models/movementsModel');
 const Showing = require('../models/showingsModel');
 const Card = require('../models/cardsModel'); // Asegúrate de tener este modelo
-
+const Room = require('../models/roomsModel');
+const User = require('../models/usersModel');
 /**
  * Inicia el proceso de pago para una reserva.
  * Crea un registro en la colección de pagos con estado 'pending' y calcula el monto y descuento aplicable.
@@ -24,22 +25,37 @@ const initiateReservationPayment = async (req, res) => {
         }
 
         const showing = await Showing.findById(reservation.showing);
+        const room = await Room.findById(showing.room);
+        const user = await User.findById(req.user._id).populate('card');
+
         if (!showing) {
             return res.status(404).json({ message: 'Función no encontrada' });
         }
 
-        const totalAmount = showing.price + reservation.seats.length * showing.seatPrice;
+        const card = user.card;
+        const currentDate = new Date();
+        let totalAmount = 0;
 
-        // Verifica si el usuario tiene una tarjeta VIP
-        const userCard = await Card.findOne({ user: req.user._id, validity: { $gte: new Date() } });
-        const discount = userCard ? userCard.discount : 0;
-        const discountedAmount = totalAmount - (totalAmount * discount / 100);
+        showing.availableSeats.forEach(seat => {
+            if (reservation.seats.includes(seat.name)) {
+                totalAmount += seat.price;
+            }
+        });
+
+        let discountedAmount;
+        if (card && card.validity >= currentDate) {
+            const discount = card.discount;
+            discountedAmount = totalAmount - (totalAmount * discount / 100);
+        } else {
+            discountedAmount = totalAmount;
+        }
 
         const newPayment = new Payment({
             movement: reservation._id,
             paymentMethod: paymentMethod || 'credit_card',
             amount: discountedAmount,
-            discount: userCard ? userCard._id : null
+            discount: card ? card.discount : null,
+            status: 'pending'
         });
 
         await newPayment.save();
@@ -50,6 +66,7 @@ const initiateReservationPayment = async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor' });
     }
 };
+
 
 /**
  * Actualiza el estado del pago y maneja la lógica de actualización de la reserva.
