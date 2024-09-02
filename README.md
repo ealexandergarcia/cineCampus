@@ -374,3 +374,42 @@ http://localhost:5000/
   }
   ```
 
+### 3.2 API para Cancelar Reserva de Asientos:
+ 
+- **Método:** `PUT`
+- **Endpoint:** `movements/v1/reserve/cancel/:reservationId`
+- **Descripción:** Permite la cancelación de una reserva de asiento ya realizada. La cancelación solo es posible si la reserva no tiene un pago asociado.
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** 
+  - Authorization: Bearer <tu_jwt_token>
+- **Params:**
+  - reservationId: ID del movimiento de reserva
+
+#### Respuestas
+- **Reserva cancelada con éxito (200)** 
+  ```json
+  {
+      "message": "Reserva cancelada con éxito",
+      "reservation": {
+          "_id": "64f5f7c9123abc001c8b789e",
+          "user": "64f4d5e525e4f5405a4b82a2",
+          "showing": "64f5f55a25e4f5405a4b829c",
+          "seats": ["A1", "A2"],
+          "status": "cancelled",
+          "date": "2024-09-02T18:25:43.511Z",
+          "__v": 0
+      }
+  }
+  ```
+- **Función no encontrada (404)** 
+  ```json
+  {
+      "message": "Reserva no encontrada"
+  }
+  ```
+- **Alguno(s) de los asientos no están disponibles. (400)** 
+  ```json
+  {
+      "message": "No se puede cancelar una reserva con un pago asociado"
+  }
+  ```
