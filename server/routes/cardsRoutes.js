@@ -4,6 +4,6 @@ const authMiddleware = require('../middleware/authMiddleware'); // Asegúrate de
 const { verifyVipCard } = require('../controllers/cardsController');
 
 // Ruta para verificar tarjeta VIP
-router.get('/verify', authMiddleware, verifyVipCard);
+router.get('/v1/verify', authMiddleware, verifyVipCard);
 
 module.exports = router;
