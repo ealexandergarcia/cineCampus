@@ -34,85 +34,75 @@ const createMovement = async (req, res) => {
             return res.status(404).json({ message: 'Función no encontrada' });
         }
 
-        // Verifica si el usuario tiene una tarjeta VIP
+        // Verifica si todos los asientos solicitados están disponibles
+        const unavailableSeats = [];
+        showing.availableSeats.forEach(seat => {
+            if (seats.includes(seat.name) && !seat.available) {
+                unavailableSeats.push(seat.name);
+            }
+        });
+
+        if (unavailableSeats.length > 0) {
+            return res.status(400).json({ 
+                message: `Asientos no disponibles: ${unavailableSeats.join(', ')}`
+            });
+        }
+
+        // Calcula el monto total y actualiza el estado de los asientos a no disponibles
+        let totalAmount = 0;
+        showing.availableSeats.forEach(seat => {
+            if (seats.includes(seat.name)) {
+                seat.available = false;
+                totalAmount += seat.price;
+            }
+        });
+
+        await showing.save();
+
+        // Verifica si el usuario tiene una tarjeta VIP válida
         const card = user.card;
         const currentDate = new Date();
 
-        // Verifica si la tarjeta es válida
+        let finalAmount = room.price + totalAmount;
+        let discount = null;
+
         if (card && card.validity >= currentDate) {
-            // Tarjeta válida, se aplica el descuento
-            const discount = card.discount;
-            let totalAmount = 0;
-
-            showing.availableSeats.forEach(seat => {
-                if (seats.includes(seat.name)) {
-                    seat.available = false;
-                    totalAmount += seat.price;
-                }
-            });
-
-            await showing.save();
-
-            const newMovement = new Movement({
-                user: req.user._id,
-                showing: showingId,
-                seats: seats
-            });
-
-            await newMovement.save();
-
-            const discountedAmount = (room.price + totalAmount) - ((room.price + totalAmount) * discount / 100);
-
-            const newPayment = new Payment({
-                movement: newMovement._id,
-                paymentMethod: paymentMethod || 'credit_card',
-                amount: discountedAmount,
-                discount: card.discount,
-                status: 'pending'
-            });
-
-            await newPayment.save();
-
-            res.status(201).json({ message: 'Compra realizada con éxito, pago pendiente', movement: newMovement, payment: newPayment });
-        } else {
-            // Usuario no tiene tarjeta VIP o la tarjeta no es válida
-            let totalAmount = 0;
-
-            showing.availableSeats.forEach(seat => {
-                if (seats.includes(seat.name)) {
-                    seat.available = false;
-                    totalAmount += seat.price;
-                }
-            });
-
-            await showing.save();
-
-            const newMovement = new Movement({
-                user: req.user._id,
-                showing: showingId,
-                seats: seats
-            });
-
-            await newMovement.save();
-
-            const newPayment = new Payment({
-                movement: newMovement._id,
-                paymentMethod: paymentMethod || 'credit_card',
-                amount: room.price + totalAmount,
-                discount: null, // Sin descuento
-                status: 'pending'
-            });
-
-            await newPayment.save();
-
-            res.status(201).json({ message: 'Compra realizada con éxito, pago pendiente', movement: newMovement, payment: newPayment });
+            discount = card.discount;
+            finalAmount -= finalAmount * discount / 100;
         }
+
+        // Crea el movimiento
+        const newMovement = new Movement({
+            user: req.user._id,
+            showing: showingId,
+            seats: seats
+        });
+
+        await newMovement.save();
+
+        // Crea el pago
+        const newPayment = new Payment({
+            movement: newMovement._id,
+            paymentMethod: paymentMethod || 'credit_card',
+            amount: finalAmount,
+            discount: discount,
+            status: 'pending'
+        });
+
+        await newPayment.save();
+
+        res.status(201).json({ 
+            message: 'Compra realizada con éxito, pago pendiente', 
+            movement: newMovement, 
+            payment: newPayment 
+        });
 
     } catch (error) {
         console.error('Error al crear el movimiento:', error);
         res.status(500).json({ message: 'Error en el servidor' });
     }
 };
+
 
 
 
