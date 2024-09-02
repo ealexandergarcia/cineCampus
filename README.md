@@ -415,9 +415,9 @@ http://localhost:5000/
   ```
 
   
-## 3. Descuentos y Tarjetas VIP
+## 4. Descuentos y Tarjetas VIP
 
-### 3.1 API para Aplicar Descuentos:
+### 4.1 API para Aplicar Descuentos:
  
 - **Descripción:** Esta API se encarga de iniciar el proceso de pago para una reserva de asientos, gestionando de forma interna la aplicación de descuentos si el usuario tiene una tarjeta VIP válida. El proceso de validación del descuento está integrado en la lógica de creación del pago y no requiere una API intermedia separada para verificar la validez de la tarjeta.
 
@@ -432,4 +432,37 @@ http://localhost:5000/
 4. **Creación del Pago**:
 Se genera un nuevo registro de pago con el monto total ajustado y el descuento aplicado (si corresponde). El estado del pago se establece inicialmente como 'pending'.
 
-### 3.2 API para Verificar Tarjeta VIP:
+### 4.2 API para Verificar Tarjeta VIP:
+ 
+- **Método:** `GET`
+- **Endpoint:** `/card/v1/verify`
+- **Descripción:** Verifica el estado de la tarjeta VIP del usuario autenticado. Proporciona información sobre si la tarjeta está activa, ha expirado, o si el usuario no tiene tarjeta VIP.
+- **Autenticación:** Requiere token JWT en el encabezado.
+- **Headers:** 
+  - Authorization: Bearer <tu_jwt_token>
+
+#### Respuestas
+- **Tarjeta VIP activa (200)** 
+  ```json
+  {
+    "message": "Tu tarjeta VIP está activa y tiene un descuento del 15%."
+  }
+  ```
+- **Tarjeta VIP expiró (400)** 
+  ```json
+  {
+    "message": "Tu tarjeta VIP ha expirado. La tarjeta caducó el 2023-01-01. Por favor, renueva tu tarjeta para seguir disfrutando de los beneficios."
+  }
+  ```
+- **Usuario no tiene tarjeta VIP (404)** 
+  ```json
+  {
+  "message": "Este usuario no cuenta con una tarjeta VIP. Te invitamos a adquirir una para obtener descuentos."
+  }
+  ```
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error en el servidor al verificar la tarjeta VIP."
+  }
+  ```
