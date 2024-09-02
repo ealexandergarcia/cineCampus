@@ -413,3 +413,23 @@ http://localhost:5000/
       "message": "No se puede cancelar una reserva con un pago asociado"
   }
   ```
+
+  
+## 3. Descuentos y Tarjetas VIP
+
+### 3.1 API para Aplicar Descuentos:
+ 
+- **Descripción:** Esta API se encarga de iniciar el proceso de pago para una reserva de asientos, gestionando de forma interna la aplicación de descuentos si el usuario tiene una tarjeta VIP válida. El proceso de validación del descuento está integrado en la lógica de creación del pago y no requiere una API intermedia separada para verificar la validez de la tarjeta.
+
+
+
+#### Proceso Interno de Validación y Aplicación de Descuentos::
+1. **Cálculo del Monto Total:** Se determina el monto total a pagar sumando el valor de la sala y el valor de cada uno de los asientos reservados.
+2. **Verificación de Tarjeta VIP:** Se verifica si el usuario tiene una tarjeta VIP
+3. **Aplicación del Descuento:** 
+- La validación de la tarjeta VIP se realiza como parte del proceso de creación del pago. Se busca la tarjeta VIP asociada al usuario y se verifica su validez. La validez de la tarjeta se determina comparando su fecha de vencimiento con la fecha actual.
+- Si el usuario tiene una tarjeta VIP válida, se calcula el descuento aplicable y se ajusta el monto total. Si no hay una tarjeta válida, el monto total permanece sin descuento.
+4. **Creación del Pago**:
+Se genera un nuevo registro de pago con el monto total ajustado y el descuento aplicado (si corresponde). El estado del pago se establece inicialmente como 'pending'.
+
+### 3.2 API para Verificar Tarjeta VIP:
