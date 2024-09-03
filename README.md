@@ -466,3 +466,169 @@ Se genera un nuevo registro de pago con el monto total ajustado y el descuento a
     "message": "Error en el servidor al verificar la tarjeta VIP."
   }
   ```
+
+## 5. Roles Definidos
+
+### 5.1 API para Crear Usuario:
+
+- **Método:** `POST`
+- **Endpoint:** `/users/register`
+- **Descripción:** Permite la creación de un nuevo usuario en el sistema. Al crear un usuario, se verifica si el correo electrónico ya está registrado. La contraseña del usuario se encripta antes de ser almacenada en la base de datos. El usuario se guarda en la colección de users y se crea un usuario en MongoDB Atlas con los permisos adecuados.
+- **Body:**
+```json
+{
+  "name": "Juan Pérez",
+  "email": "juan.perez@example.com",
+  "password": "tuContraseñaSegura",
+  "phone": "1234567890"
+}
+```
+
+#### Respuestas
+- **Usuario creado con éxito (201)** 
+  ```json
+  {
+    "message": "Usuario creado con éxito",
+    "user": {
+      "name": "Juan Pérez",
+      "email": "juan.perez@example.com",
+      "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+      "phone": "1234567890",
+      "role": "standard",
+      "__v": 0
+    }
+  }
+  ```
+- **Correo Electrónico Duplicado (400)** 
+  ```json
+  {
+    "message": "El correo electrónico ya está registrado"
+  }
+  ```
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error al crear el usuario",
+    "error": "Detalles del error"
+  }
+  ```
+### 5.2 Obtener Detalles de Usuario:
+
+- **Método:** `GET`
+- **Endpoint:** `/users/:id`
+- **Descripción:** Obtiene los detalles de un usuario específico basado en su id.
+- **Params:**
+  - usersId: ID del usuario
+
+#### Respuestas
+- **Retorna los detalles del usuario (200)** 
+  ```json
+  {
+    "user": {
+      "name": "Juan Prez",
+      "email": "ssssss@example.com",
+      "password": "$2a$10$...",
+      "phone": "1234567890",
+      "role": "standard",
+      "card": "ObjectId"
+    }
+  }
+  ```
+- **Usuario no encontrado (404)** 
+  ```json
+  {
+    "message": "Usuario no encontrado"
+  }
+  ```
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error en el servidor"
+  }
+  ```
+### 5.3 API para Actualizar Rol de Usuario:
+
+- **Método:** `PUT`
+- **Endpoint:** `/users/:id`
+- **Descripción:** Actualiza el rol a nivel de coleccion y de usuario de mongo.
+- **Params:**
+  - usersId: ID del usuario
+- **Body:**
+  ```json
+  {
+      "newRole": "VIP"
+  }
+  ```
+#### Respuestas
+- **Retorna los detalles del usuario (200)** 
+  ```json
+  {
+      "message": "Rol de usuario actualizado con éxito",
+      "user": {
+          "_id": "605c72efc72f241c1f1e4d8b",
+          "name": "Juan Pérez",
+          "email": "juan.perez@example.com",
+          "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+          "phone": "1234567890",
+          "role": "VIP",
+          "__v": 0
+      }
+  }
+  ```
+- **Usuario no encontrado (400)** 
+  ```json
+  {
+    "message": "Rol inválido"
+  }
+  ```
+- **Usuario no encontrado (404)** 
+  ```json
+  {
+    "message": "Usuario no encontrado"
+  }
+  ```
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error en el servidor"
+  }
+  ```
+### 5.4 API para Listar Usuarios:
+
+- **Método:** `GET`
+- **Endpoint:** `/users` o `/users?role=VIP`
+- **Descripción:** Lista todos los usuarios.
+#### Respuestas
+- **Usuarios recuperados exitosamente (200)** 
+  ```json
+  {
+      "message": "Users retrieved successfully",
+      "users": [
+          {
+              "_id": "60d21b4667d0d8992e610c85",
+              "name": "Juan Pérez",
+              "email": "juan.perez@example.com",
+              "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+              "phone": "1234567890",
+              "role": "standard",
+              "__v": 0
+          },
+          {
+              "_id": "60d21b4667d0d8992e610c86",
+              "name": "Ana López",
+              "email": "ana.lopez@example.com",
+              "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+              "phone": "0987654321",
+              "role": "VIP",
+              "__v": 0
+          }
+      ]
+  }
+  ```
+
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error en el servidor"
+  }
+  ```
