@@ -593,3 +593,42 @@ Se genera un nuevo registro de pago con el monto total ajustado y el descuento a
     "message": "Error en el servidor"
   }
   ```
+### 5.4 API para Listar Usuarios:
+
+- **Método:** `GET`
+- **Endpoint:** `/users` o `/users?role=VIP`
+- **Descripción:** Lista todos los usuarios.
+#### Respuestas
+- **Usuarios recuperados exitosamente (200)** 
+  ```json
+  {
+      "message": "Users retrieved successfully",
+      "users": [
+          {
+              "_id": "60d21b4667d0d8992e610c85",
+              "name": "Juan Pérez",
+              "email": "juan.perez@example.com",
+              "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+              "phone": "1234567890",
+              "role": "standard",
+              "__v": 0
+          },
+          {
+              "_id": "60d21b4667d0d8992e610c86",
+              "name": "Ana López",
+              "email": "ana.lopez@example.com",
+              "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+              "phone": "0987654321",
+              "role": "VIP",
+              "__v": 0
+          }
+      ]
+  }
+  ```
+
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error en el servidor"
+  }
+  ```
