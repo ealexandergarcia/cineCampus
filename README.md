@@ -632,3 +632,124 @@ Se genera un nuevo registro de pago con el monto total ajustado y el descuento a
     "message": "Error en el servidor"
   }
   ```
+
+
+## 6. Compras en Línea
+
+### 6.1 API para Procesar Pagos:
+
+- **Método:** `PUT`
+- **Endpoint:** `/payments/:paymentId/status`
+- **Descripción:** Actualiza el estado de un pago y crea un nuevo movimiento asociado a ese pago. Maneja la lógica para estados de pago como 'accepted', 'rejected' y 'cancelled', administrando la disponibilidad de los asientos.
+- **Params:**
+  - paymentId : ID del pago que se va a actualizar.
+- **Body:**
+```json
+  {
+    "status": "cancelled",  // puede ser 'accepted', 'cancelled' o 'rejected'
+    "paymentMethod": "credit_card"  // puede ser 'credit_card', 'debit_card' o 'paypal'
+  }
+```
+
+#### Respuestas
+- **Pago actualizado y nuevo movimiento creado (200)** 
+  ```json
+    {
+      "message": "Payment updated and new movement created",
+      "payment": {
+          "_id": "12345",
+          "status": "accepted",
+          "movement": {
+              "user": "67890",
+              "showing": "54321",
+              "seats": ["A1", "A2"],
+              "date": "2024-09-03T14:00:00.000Z",
+              "status": "purchased"
+          }
+      },
+      "newMovement": {
+          "_id": "67890",
+          "user": "67890",
+          "showing": "54321",
+          "seats": ["A1", "A2"],
+          "date": "2024-09-03T14:00:00.000Z",
+          "status": "purchased"
+      }
+    }
+
+  ```
+- **Pago no encontrado (404)** 
+  ```json
+  {
+      "message": "Payment not found"
+  }
+  ```
+- **Estado de pago ya actualizado (400)** 
+  ```json
+  {
+    "message": "Payment status already updated"
+  }
+  ```
+- **Estado inválido (400)** 
+  ```json
+  {
+      "message": "Invalid status"
+  }
+  ```
+- **Error en el servidor (500)** 
+  ```json
+  {
+      "message": "Error en el servidor",
+      "error": "Error details here"
+  }
+  ```
+### 6.2 API para Iniciar el Proceso de Pago de Reservación:
+
+- **Método:** `POST`
+- **Endpoint:** `payments/v1/initiate/:reservationId`
+- **Descripción:** Inicia el proceso de pago para una reservación. Calcula el monto total a pagar, aplicando descuentos si el usuario tiene una tarjeta VIP válida, y crea un nuevo registro de pago.
+- **Params:**
+  - reservationId  : ID de la reservación que se va a pagar.
+- **Body:**
+```json
+  {
+    "paymentMethod": "credit_card"  // puede ser 'credit_card', 'debit_card' o 'paypal'
+  }
+```
+
+#### Respuestas
+- **Proceso de pago iniciado exitosamente (201)** 
+  ```json
+  {
+      "message": "Proceso de pago iniciado",
+      "payment": {
+          "_id": "67890",
+          "movement": "12345",
+          "paymentMethod": "credit_card",
+          "amount": 100.00,
+          "discount": 10,
+          "status": "pending",
+          "__v": 0
+      }
+  }
+  ```
+- **Reservación no encontrada o ya procesada (404)** 
+  ```json
+  {
+      "message": "Reservation not found or already processed"
+  }
+  ```
+- **Proyección no encontrada (404)** 
+  ```json
+  {
+      "message": "Showing not found"
+  }
+  ```
+- **Error en el servidor (500)** 
+  ```json
+  {
+      "message": "Error en el servidor",
+      "error": "Error details here"
+  }
+  ```
+
