@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const Database = require('./server/utils/db'); // Asegúrate de que la conexión a DB esté configurada
 const moviesRoutes = require('./server/routes/moviesRoutes'); // Importa las rutas de películas
@@ -9,6 +10,7 @@ const authRoutes = require('./server/routes/authRoutes');
 const movementsRoutes = require('./server/routes/movementsRouter');
 const paymentsRouter = require('./server/routes/paymentsRouter');
 const cardsRoutes = require('./server/routes/cardsRoutes');
+const userRouter = require('./server/routes/userRouter');
 
 
 
@@ -25,6 +27,7 @@ app.use('/auth', authRoutes);
 app.use('/movements', movementsRoutes);
 app.use('/payments', paymentsRouter);
 app.use('/card', cardsRoutes);
+app.use('/users', userRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
