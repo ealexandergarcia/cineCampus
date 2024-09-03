@@ -164,3 +164,71 @@ exports.getUserDetails = handleAsync(async (req, res) => {
 
     res.status(200).json({ user });
 });
+
+/**
+ * @api {put} /users/:userId Actualizar Rol de Usuario
+ * @apiName UpdateUserRole
+ * @apiGroup Users
+ *
+ * @apiParam {String} userId ID del usuario cuya información se actualizará.
+ * @apiParam {String} newRole Nuevo rol que se asignará al usuario (debe ser "standard" o "VIP").
+ *
+ * @apiSuccess {String} message Mensaje de éxito.
+ * @apiSuccess {Object} user Usuario con el rol actualizado.
+ *
+ * @apiError (400 Bad Request) InvalidRole El rol proporcionado no es válido.
+ * @apiError (404 Not Found) UserNotFound El usuario con el ID proporcionado no fue encontrado.
+ * @apiError (500 Internal Server Error) ServerError Error al actualizar el rol del usuario.
+ *
+ * @apiExample {json} Ejemplo de solicitud:
+ *     PUT /users/605c72efc72f241c1f1e4d8b
+ *     {
+ *       "newRole": "VIP"
+ *     }
+ *
+ * @apiExample {json} Ejemplo de respuesta exitosa:
+ *     {
+ *       "message": "Rol de usuario actualizado con éxito",
+ *       "user": {
+ *         "_id": "605c72efc72f241c1f1e4d8b",
+ *         "name": "Juan Pérez",
+ *         "email": "juan.perez@example.com",
+ *         "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+ *         "phone": "1234567890",
+ *         "role": "VIP",
+ *         "__v": 0
+ *       }
+ *     }
+ */
+exports.updateUserRole = handleAsync(async (req, res) => {
+    const userId = req.params.userId; // Obtener el userId de los parámetros de la URL
+    const { newRole } = req.body; // Obtener el nuevo rol del cuerpo de la solicitud
+
+    // Validar el rol
+    const validRoles = ['standard', 'VIP'];
+    if (!validRoles.includes(newRole)) {
+        return res.status(400).json({ message: 'Rol inválido' });
+    }
+
+    // Conectar a la base de datos de la aplicación
+    const db = Database.getInstance();
+    const user = await User.findById(userId);
+
+    if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Actualizar el rol del usuario en la colección de usuarios
+    user.role = newRole;
+    await user.save();
+
+    // Actualizar el rol del usuario en MongoDB Atlas (si es necesario)
+    const client = mongoose.connection.client;
+    const adminDb = client.db('cineCampus');
+    await adminDb.command({
+        updateUser: user.email,
+        roles: [{ role: newRole, db: 'cineCampus' }]
+    });
+
+    res.status(200).json({ message: 'Rol de usuario actualizado con éxito', user });
+});
