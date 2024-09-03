@@ -1,12 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const paymentsController = require('../controllers/paymentsController');
+const { updatePaymentStatus, initiateReservationPayment } = require('../controllers/paymentsController');
 const authenticate = require('../middleware/authMiddleware');
 
-// Ruta para iniciar el proceso de pago de una reserva
-router.post('/v1/initiate/:reservationId', authenticate, paymentsController.initiateReservationPayment);
+/**
+ * @route POST /v1/initiate/:reservationId
+ * @description Initiates the payment process for a reservation. The reservation must exist and be in the 'reserved' status. The route is protected and requires user authentication.
+ * 
+ * @param {String} req.params.reservationId - The ID of the reservation for which the payment process is being initiated.
+ * @param {String} req.body.paymentMethod - The payment method to be used (optional, defaults to 'credit_card').
+ * 
+ * @returns {Object} - A JSON object containing a success message and the payment details if the process is initiated successfully.
+ * 
+ */
+router.post('/v1/initiate/:reservationId', authenticate, initiateReservationPayment);
 
-// Ruta para actualizar el estado del pago
-router.put('/:paymentId/status', authenticate, paymentsController.updatePaymentStatus);
+/**
+ * @route PUT /:paymentId/status
+ * @description Updates the status of a payment. This route is protected and requires user authentication.
+ * 
+ * @param {String} req.params.paymentId - The ID of the payment to be updated.
+ * @param {String} req.body.status - The new status of the payment ('accepted', 'rejected', 'cancelled').
+ * 
+ * @returns {Object} - A JSON object containing a success message and the updated payment details.
+ */
+router.put('/:paymentId/status', authenticate, updatePaymentStatus);
 
 module.exports = router;
