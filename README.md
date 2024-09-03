@@ -546,3 +546,50 @@ Se genera un nuevo registro de pago con el monto total ajustado y el descuento a
     "message": "Error en el servidor"
   }
   ```
+### 5.3 API para Actualizar Rol de Usuario:
+
+- **Método:** `PUT`
+- **Endpoint:** `/users/:id`
+- **Descripción:** Actualiza el rol a nivel de coleccion y de usuario de mongo.
+- **Params:**
+  - usersId: ID del usuario
+- **Body:**
+  ```json
+  {
+      "newRole": "VIP"
+  }
+  ```
+#### Respuestas
+- **Retorna los detalles del usuario (200)** 
+  ```json
+  {
+      "message": "Rol de usuario actualizado con éxito",
+      "user": {
+          "_id": "605c72efc72f241c1f1e4d8b",
+          "name": "Juan Pérez",
+          "email": "juan.perez@example.com",
+          "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+          "phone": "1234567890",
+          "role": "VIP",
+          "__v": 0
+      }
+  }
+  ```
+- **Usuario no encontrado (400)** 
+  ```json
+  {
+    "message": "Rol inválido"
+  }
+  ```
+- **Usuario no encontrado (404)** 
+  ```json
+  {
+    "message": "Usuario no encontrado"
+  }
+  ```
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error en el servidor"
+  }
+  ```
