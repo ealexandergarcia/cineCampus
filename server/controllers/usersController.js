@@ -232,3 +232,62 @@ exports.updateUserRole = handleAsync(async (req, res) => {
 
     res.status(200).json({ message: 'Rol de usuario actualizado con éxito', user });
 });
+
+
+/**
+ * @description List all users in the system or filter by role.
+ * This API endpoint allows you to retrieve a list of all users in the system. You can optionally filter the results based on the user role by providing a query parameter. 
+ * If no role is specified, all users will be returned.
+ * 
+ * @param {Object} req - The HTTP request object.
+ * @param {Object} res - The HTTP response object.
+ * 
+ * @query {String} [role] - (Optional) The role to filter users by. Can be `VIP`, `standard`, or `adminCine`. If not provided, all users will be listed.
+ * 
+ * @returns {Object} - A JSON object containing the list of users and a success message.
+ * 
+ * @throws {Object} - Returns an error response if there is a problem retrieving users from the database.
+ * 
+ * @response {
+ *   "message": "Users retrieved successfully",
+ *   "users": [
+ *     {
+ *       "_id": "60d21b4667d0d8992e610c85",
+ *       "name": "Juan Pérez",
+ *       "email": "juan.perez@example.com",
+ *       "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+ *       "phone": "1234567890",
+ *       "role": "standard",
+ *       "__v": 0
+ *     },
+ *     {
+ *       "_id": "60d21b4667d0d8992e610c86",
+ *       "name": "Ana López",
+ *       "email": "ana.lopez@example.com",
+ *       "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+ *       "phone": "0987654321",
+ *       "role": "VIP",
+ *       "__v": 0
+ *     }
+ *   ]
+ * }
+ * 
+ * @response {
+ *   "message": "Error retrieving users",
+ *   "error": "Detailed error message"
+ * }
+ */
+exports.listUsers = handleAsync(async (req, res) => {
+    const { role } = req.query; // Obtener el rol del query string
+
+    // Construir el filtro de consulta
+    const filter = role ? { role } : {};
+
+    // Obtener la lista de usuarios según el filtro
+    const users = await User.find(filter);
+
+    res.status(200).json({
+        message: 'Users retrieved successfully',
+        users
+    });
+});
