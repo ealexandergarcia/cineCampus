@@ -466,3 +466,49 @@ Se genera un nuevo registro de pago con el monto total ajustado y el descuento a
     "message": "Error en el servidor al verificar la tarjeta VIP."
   }
   ```
+
+## 5. Roles Definidos
+
+### 5.1 API para Crear Usuario:
+
+- **Método:** `POST`
+- **Endpoint:** `/users/register`
+- **Descripción:** Permite la creación de un nuevo usuario en el sistema. Al crear un usuario, se verifica si el correo electrónico ya está registrado. La contraseña del usuario se encripta antes de ser almacenada en la base de datos. El usuario se guarda en la colección de users y se crea un usuario en MongoDB Atlas con los permisos adecuados.
+- **Body:**
+```json
+{
+  "name": "Juan Pérez",
+  "email": "juan.perez@example.com",
+  "password": "tuContraseñaSegura",
+  "phone": "1234567890"
+}
+```
+
+#### Respuestas
+- **Usuario creado con éxito (201)** 
+  ```json
+  {
+    "message": "Usuario creado con éxito",
+    "user": {
+      "name": "Juan Pérez",
+      "email": "juan.perez@example.com",
+      "password": "$2a$10$KUuVYNo5kXj2eJRzLLHAfOr/..P1xaTXGvVYmCiUcS3ekJiDt/HnG",
+      "phone": "1234567890",
+      "role": "standard",
+      "__v": 0
+    }
+  }
+  ```
+- **Correo Electrónico Duplicado (400)** 
+  ```json
+  {
+    "message": "El correo electrónico ya está registrado"
+  }
+  ```
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error al crear el usuario",
+    "error": "Detalles del error"
+  }
+  ```
