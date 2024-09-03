@@ -512,3 +512,37 @@ Se genera un nuevo registro de pago con el monto total ajustado y el descuento a
     "error": "Detalles del error"
   }
   ```
+### 5.2 Obtener Detalles de Usuario:
+
+- **Método:** `GET`
+- **Endpoint:** `/users/:id`
+- **Descripción:** Obtiene los detalles de un usuario específico basado en su id.
+- **Params:**
+  - usersId: ID del usuario
+
+#### Respuestas
+- **Retorna los detalles del usuario (200)** 
+  ```json
+  {
+    "user": {
+      "name": "Juan Prez",
+      "email": "ssssss@example.com",
+      "password": "$2a$10$...",
+      "phone": "1234567890",
+      "role": "standard",
+      "card": "ObjectId"
+    }
+  }
+  ```
+- **Usuario no encontrado (404)** 
+  ```json
+  {
+    "message": "Usuario no encontrado"
+  }
+  ```
+- **Error en el servido (500)** 
+  ```json
+  {
+    "message": "Error en el servidor"
+  }
+  ```
