@@ -11,6 +11,7 @@ const movementsRoutes = require('./server/routes/movementsRouter');
 const paymentsRouter = require('./server/routes/paymentsRouter');
 const cardsRoutes = require('./server/routes/cardsRoutes');
 const userRouter = require('./server/routes/userRouter');
+const confirmationRoutes = require('./server/routes/confirmationRoutes');
 
 
 
@@ -28,6 +29,7 @@ app.use('/movements', movementsRoutes);
 app.use('/payments', paymentsRouter);
 app.use('/card', cardsRoutes);
 app.use('/users', userRouter);
+app.use('/purchase', confirmationRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

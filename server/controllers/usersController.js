@@ -1,4 +1,5 @@
 const User = require('../models/usersModel');
+const Card = require('../models/cardsModel');
 const bcrypt = require('bcryptjs');
 const Database = require('../utils/db');
 const mongoose = require('mongoose');
@@ -63,35 +64,46 @@ const handleAsync = require('../utils/handleAsync');
  * }
  */
 exports.createUser = handleAsync(async (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, role } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ name });
     if (existingUser) {
         return res.status(400).json({ message: 'El correo electrónico ya está registrado' });
     }
 
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-
+    // Crea el nuevo usuario
     const newUser = new User({
         name,
         email,
         password: hashedPassword,
         phone,
-        role: 'standard'
+        role
     });
 
     try {
+        // Si el rol es VIP, asignar una tarjeta automáticamente
+        if (role === 'VIP') {
+            const cards = await Card.find(); // Encuentra todas las tarjetas disponibles
+            if (cards.length === 0) {
+                return res.status(500).json({ message: 'No hay tarjetas disponibles' });
+            }
+            const randomCard = cards[Math.floor(Math.random() * cards.length)];
+            newUser.card = randomCard._id; // Asignar el ID de la tarjeta al nuevo usuario
+        }
+
+        // Guardar el nuevo usuario
         await newUser.save();
 
+        // Crear el usuario en MongoDB Atlas si es necesario
         const client = mongoose.connection.client;
         const adminDb = client.db('cineCampus');
         await adminDb.command({
-            createUser: email,
+            createUser: name,
             pwd: password,
-            roles: [{ role: 'standard', db: 'cineCampus' }]
+            roles: [{ role: role, db: 'cineCampus' }]
         });
 
         res.status(201).json({ message: 'Usuario creado con éxito', user: newUser });
@@ -218,8 +230,18 @@ exports.updateUserRole = handleAsync(async (req, res) => {
         return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    // Actualizar el rol del usuario en la colección de usuarios
+    // Obtener todas las tarjetas disponibles
+    const cards = await Card.find(); // Encuentra todas las tarjetas
+    if (cards.length === 0) {
+        return res.status(500).json({ message: 'No hay tarjetas disponibles' });
+    }
+
+    // Seleccionar una tarjeta al azar
+    const randomCard = cards[Math.floor(Math.random() * cards.length)];
+
+    // Actualizar el rol del usuario y el nuevo campo 'card'
     user.role = newRole;
+    user.card = randomCard._id; // Asignar el ID de la tarjeta al campo 'card'
     await user.save();
 
     // Actualizar el rol del usuario en MongoDB Atlas (si es necesario)
