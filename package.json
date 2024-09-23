@@ -1,9 +1,16 @@
 {
   "name": "mvc",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "server.js",  
   "scripts": {
-    "dev": "node --watch --env-file .env server.js"
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "cd client && vite",
+    "dev:server": "node --watch --env-file .env ./server.js",
+    "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
+    "start:client": "cd client && npm run build && npm run preview",
+    "start:server": "cd server && node --watch --env-file .env ./server.js",
+    "build": "cd client && npm run build",
+    "preview": "cd client && npm run preview"
   },
   "keywords": [],
   "author": "",
@@ -11,6 +18,7 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "concurrently": "^8.0.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "express-validator": "^7.2.0",
@@ -18,6 +26,11 @@
     "mongoose": "^8.6.0",
     "mvc": "file:",
     "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "vue": "^3.5.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.2",
+    "vite": "^5.4.1"
   }
 }
