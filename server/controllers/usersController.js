@@ -63,17 +63,12 @@ const handleAsync = require('../utils/handleAsync');
  * }
  */
 exports.createUser = handleAsync(async (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const { nick,name,email, password, phone } = req.body;
    // Verificar si el email ya está en uso
     const existingUser = await User.findOne({ email });
     if (existingUser) {
         return res.status(400).json({ message: 'El correo electrónico ya está registrado' });
     }
-   // Verificar si el phone ya está en uso
-   const existingPhoneUser = await User.findOne({ phone });
-   if (existingPhoneUser) {
-     return res.status(400).json({ message: 'Phone already in use' });
-   }
     // Verificar si el nick ya está en uso
     const existingNickUser = await User.findOne({ nick });
     if (existingNickUser) {
