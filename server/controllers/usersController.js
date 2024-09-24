@@ -64,18 +64,28 @@ const handleAsync = require('../utils/handleAsync');
  */
 exports.createUser = handleAsync(async (req, res) => {
     const { name, email, password, phone } = req.body;
-
+   // Verificar si el email ya está en uso
     const existingUser = await User.findOne({ email });
     if (existingUser) {
         return res.status(400).json({ message: 'El correo electrónico ya está registrado' });
     }
-
+   // Verificar si el phone ya está en uso
+   const existingPhoneUser = await User.findOne({ phone });
+   if (existingPhoneUser) {
+     return res.status(400).json({ message: 'Phone already in use' });
+   }
+    // Verificar si el nick ya está en uso
+    const existingNickUser = await User.findOne({ nick });
+    if (existingNickUser) {
+      return res.status(400).json({ message: 'Nick already in use' });
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
 
     const newUser = new User({
+        nick,
         name,
         email,
         password: hashedPassword,
@@ -89,12 +99,12 @@ exports.createUser = handleAsync(async (req, res) => {
         const client = mongoose.connection.client;
         const adminDb = client.db('cineCampus');
         await adminDb.command({
-            createUser: email,
+            createUser: nick,
             pwd: password,
             roles: [{ role: 'standard', db: 'cineCampus' }]
         });
 
-        res.status(201).json({ message: 'Usuario creado con éxito', user: newUser });
+        res.status(201).json({ message: 'User registered successfully', user: newUser });
     } catch (error) {
         console.error('Error al guardar el usuario:', error.message);
         res.status(500).json({ message: 'Error al crear el usuario', error: error.message });
