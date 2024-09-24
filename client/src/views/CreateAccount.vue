@@ -2,7 +2,9 @@
   <div
     class="h-screen w-screen flex flex-col justify-center items-center text-white"
   >
-    <img class="flex mb-14 ml-72" :src="smallStarImg" />
+    <button @click="goToHome">
+      <img class="flex mb-14 ml-72" :src="smallStarImg" />
+    </button>
     <h1 class="font-poppins font-bold mb-10 text-3xl mr-32">Create account</h1>
     <form @submit.prevent="createAccount">
       <div class="relative w-80">
@@ -10,8 +12,8 @@
         <input
           class="border border-slate-0 rounded-lg mb-6 px-4 py-2 w-80 bg-color1 text-black"
           type="text"
-          v-model="formData.name"
-          id="name"
+          v-model="formData.nick"
+          id="nick"
           placeholder="Your username"
           required
         />
@@ -82,7 +84,7 @@ export default {
   setup() {
     const router = useRouter();
     const formData = ref({
-      name: '',
+      nick: '',
       email: '',
       password: '',
     });
@@ -99,7 +101,7 @@ export default {
 
     const createAccount = async () => {
       try {
-        const response = await fetch(`${location.href}/v1`, {
+        const response = await fetch(`http://localhost:5000/users/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -121,6 +123,9 @@ export default {
     const goToLogin = () => {
       router.push('/login');
     };
+    const goToHome =()=>{
+      router.push('/')
+    }
 
     return {
       formData,
@@ -135,6 +140,7 @@ export default {
       togglePasswordVisibility,
       createAccount,
       goToLogin,
+      goToHome
     };
   },
 };
