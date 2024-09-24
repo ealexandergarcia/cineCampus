@@ -45,9 +45,9 @@ const loginUser = async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+        res.cookie("prueba",JSON.stringify({name:"miguel"}, {maxAge: 5000}));
         res.status(200).json({ token });
-
+        console.log(res);
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
         res.status(500).json({ message: 'Error en el servidor' });
