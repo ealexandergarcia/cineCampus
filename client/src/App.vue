@@ -1,19 +1,24 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div class="flex flex-col items-center justify-center bg-black">
-    <a href="https://vitejs.dev" target="_blank" class="p-6 transition duration-300 hover:drop-shadow-lg">
-      <img src="/vite.svg" class="h-24" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank" class="p-6 transition duration-300 hover:drop-shadow-lg">
-      <img src="./assets/vue.svg" class="h-24" alt="Vue logo" />
-    </a>
+  <div class="bg-[#121212] min-h-screen flex flex-col">
+    <Header />
+    <main class="flex-grow">
+      <MovieList />
+    </main>
+    <Footer />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
+<script>
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
+// import MovieList from './components/MovieList.vue'
+
+export default {
+  name: 'App',
+  components: { Header, Footer }
+}
+</script>
+
 <style scoped>
-/* Puedes eliminar el CSS antiguo, ya que hemos adaptado los estilos con Tailwind */
+/* No es necesario CSS adicional aquí, Tailwind maneja el layout */
 </style>
