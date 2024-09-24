@@ -1,6 +1,8 @@
 <template>
   <div class="h-screen w-screen flex flex-col justify-center items-center text-white">
-    <img class="flex mb-14 ml-72" :src="smallStarImg" />
+    <button @click="goToHome">
+      <img class="flex mb-14 ml-72" :src="smallStarImg" />
+    </button>
     <h1 class="font-poppins font-bold mb-10 text-3xl mr-60">Log in</h1>
     <form @submit.prevent="handleSubmit">
       <div class="relative mb-4 w-80 text-sm">
@@ -90,7 +92,6 @@ export default {
     const route = useRoute();
 
     const formData = ref({
-      nick: '',
       email: '',
       password: '123456789',
     });
@@ -104,6 +105,9 @@ export default {
     const goToCreateAccount = () => {
       router.push('/createAccount');
     };
+    const goToHome =()=>{
+      router.push('/')
+    }
 
     const handleSubmit = async () => {
       const config = {
@@ -111,14 +115,16 @@ export default {
         headers: {
           'Content-Type': 'application/json',
         },
+        Credential:  'include',
         body: JSON.stringify(formData.value),
       };
 
       try {
-        const response = await fetch(`${window.location.origin}${route.fullPath}/v1`, config);
+        const response = await fetch(`http://localhost:5000/auth/login`, config);
 
         if (response.status === 200) {
-          router.push('/crud');
+          console.log("llego aca");
+          console.log(response);
         } else {
           console.log(result);
         }
@@ -147,6 +153,7 @@ export default {
       togglePasswordVisibility,
       goToCreateAccount,
       handleSubmit,
+      goToHome,
       smallStarImg,
       agreeImg,
       disagreeImg,
