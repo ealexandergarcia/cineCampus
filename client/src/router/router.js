@@ -3,12 +3,13 @@ import Home from "../views/Home.vue";
 import CreateAccount from '../views/CreateAccount.vue';
 import Login from '../views/Login.vue';
 import OpenningScreen from "../views/OpenningScreen.vue";
-
+import Cinema from "../views/Cinema.vue";
 const routes = [
   { path: "/", component: OpenningScreen },
   { path: '/createAccount', component: CreateAccount },
   { path: '/login', component: Login },
-  { path: '/home', component: Home }
+  { path: '/home', component: Home },
+  { path: '/cinema', component:Cinema}
 ];
 
 const router = createRouter({
