@@ -4,8 +4,8 @@
         <div class="flex items-center">
           <img src="../assets/img/profile-picture.svg" alt="Imagen de perfil" class="w-11 h-11 rounded-full">
           <div class="ml-3">
-            <p class="text-white text-sm">Hola, Ferrucio Tuccine!</p>
-            <p class="text-white text-[15px] font-semibold">¡Veamos una película juntos!</p>
+            <p class="text-white text-sm text-left">Hola, Ferrucio Tuccine!</p>
+            <p class="text-white text-[15px] font-semibold text-left">¡Veamos una película juntos!</p>
           </div>
         </div>
         <button>
