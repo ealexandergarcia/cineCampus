@@ -1,7 +1,7 @@
 <template>
     <header class="w-full text-white p-8">
         <div class="flex justify-between items-center">
-            <router-link to="/home" class="flex items-center">
+            <router-link :to="homeRoute" class="flex items-center">
                 <img src="../assets/img/arrow-right.svg" alt="Icono de acciones" class="w-6 h-6">
             </router-link>
             <h1 class="text-lg font-semibold">{{ title }}</h1>
@@ -19,6 +19,10 @@ export default {
         title: {
             type: String,
             required: true,
+        },
+        homeRoute: {
+            type: String,
+            default: '/', // Ruta por defecto
         },
     },
     methods: {
