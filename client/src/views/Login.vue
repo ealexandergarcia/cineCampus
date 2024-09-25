@@ -1,5 +1,7 @@
 <template>
-  <div class="h-screen w-screen flex flex-col justify-center items-center text-white">
+  <div
+    class="h-screen w-screen flex flex-col justify-center items-center text-white"
+  >
     <button @click="goToHome">
       <img class="flex mb-14 ml-72" :src="smallStarImg" />
     </button>
@@ -49,13 +51,19 @@
       <img :src="LineImg" />
     </div>
     <div class="flex flex-row mb-32 gap-x-4">
-      <button class="border border-slate-0 rounded-lg px-11 py-4 w-28 bg-color1 bg-white">
+      <button
+        class="border border-slate-0 rounded-lg px-11 py-4 w-28 bg-color1 bg-white"
+      >
         <img class="w-6" :src="facebookImg" />
       </button>
-      <button class="border border-slate-0 rounded-lg px-11 py-4 w-28 bg-color1 bg-white">
+      <button
+        class="border border-slate-0 rounded-lg px-11 py-4 w-28 bg-color1 bg-white"
+      >
         <img class="w-6" :src="googleImg" />
       </button>
-      <button class="border border-slate-0 rounded-lg px-11 py-4 w-28 bg-color1 bg-white">
+      <button
+        class="border border-slate-0 rounded-lg px-11 py-4 w-28 bg-color1 bg-white"
+      >
         <img class="w-6" :src="appleImg" />
       </button>
     </div>
@@ -73,18 +81,18 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
-import smallStarImg from '../assets/img/smallStar.svg';
-import agreeImg from '../assets/img/agree.svg';
-import disagreeImg from '../assets/img/disagree.svg';
-import ableImg from '../assets/img/able.svg';
-import occultImg from '../assets/img/occult.svg';
-import googleImg from '../assets/img/google.svg';
-import facebookImg from '../assets/img/facebook.svg';
-import appleImg from '../assets/img/apple.svg';
-import LineImg from '../assets/img/Line.svg';
+import smallStarImg from "../assets/img/smallStar.svg";
+import agreeImg from "../assets/img/agree.svg";
+import disagreeImg from "../assets/img/disagree.svg";
+import ableImg from "../assets/img/able.svg";
+import occultImg from "../assets/img/occult.svg";
+import googleImg from "../assets/img/google.svg";
+import facebookImg from "../assets/img/facebook.svg";
+import appleImg from "../assets/img/apple.svg";
+import LineImg from "../assets/img/Line.svg";
 
 export default {
   setup() {
@@ -92,8 +100,8 @@ export default {
     const route = useRoute();
 
     const formData = ref({
-      email: '',
-      password: '123456789',
+      email: "",
+      password: "123456789",
     });
 
     const passwordVisible = ref(false);
@@ -103,47 +111,51 @@ export default {
     };
 
     const goToCreateAccount = () => {
-      router.push('/createAccount');
+      router.push("/createAccount");
     };
-    const goToHome =()=>{
-      router.push('/')
-    }
+    const goToHome = () => {
+      router.push("/");
+    };
 
     const handleSubmit = async () => {
       const config = {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        Credential:  'include',
+        credentials: "include", // Esto permite enviar y recibir cookies
         body: JSON.stringify(formData.value),
       };
 
       try {
-        const response = await fetch(`http://localhost:5000/auth/login`, config);
+        const response = await fetch(
+          "http://localhost:5000/auth/login",
+          config
+        );
 
         if (response.status === 200) {
-          console.log("llego aca");
-          console.log(response);
+          const data = await response.json();
+          console.log("Inicio de sesión exitoso:", data);
+          // Redirigir o hacer algo con el token o cookies aquí
         } else {
-          console.log(result);
+          console.log("Error al iniciar sesión:", response.status);
         }
       } catch (error) {
-        console.error('Error en la solicitud:', error);
+        console.error("Error en la solicitud:", error);
       }
     };
 
     onMounted(() => {
-      const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
-        const [name, value] = cookie.split('=');
+      const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+        const [name, value] = cookie.split("=");
         acc[name] = value;
         return acc;
       }, {});
 
-      const cookieName = 'prueba'; // Nombre de la cookie que deseas verificar
+      const cookieName = "prueba"; // Nombre de la cookie que deseas verificar
 
       if (cookies[cookieName]) {
-        router.push('/crud'); // Redirige si la cookie está presente
+        router.push("/crud"); // Redirige si la cookie está presente
       }
     });
 
