@@ -41,6 +41,7 @@ const getMovies = async (req, res) => {
                     duration: { $first: '$duration' },
                     showings: {
                         $push: {
+                            _id: '$showings._id',
                             date: '$showings.date',
                             time: '$showings.time'
                         }

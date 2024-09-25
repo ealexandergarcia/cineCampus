@@ -1,5 +1,15 @@
 # CineCampus API
 
+## env
+MONGO_PROTOCOLO=mongodb://
+MONGO_USER=root
+MONGO_PSW=campus2023
+MONGO_HOST=localhost
+MONGO_PORT=27017
+MONGO_DB_NAME=cineCampus
+MONGO_AUTH=authSource=admin
+JWT_SECRET=zSev9kZVpQ3D9FnnLUJb7A0pZPl1o3HoC6Ol4zZj1XM=
+
 ## Base URL
 
 http://localhost:5000/
@@ -262,7 +272,7 @@ http://localhost:5000/
 ### 3.1 API para Reservar Asientos:
 
 - **Método:** `POST`
-- **Endpoint:** `movements/v1/reservation`
+- **Endpoint:** `movements/v1/reserve`
 - **Descripción:** Reserva asientos para una función específica. Crea un movimiento con estado 'reserved'.
 - **Autenticación:** Requiere token JWT en el encabezado.
 - **Headers:**

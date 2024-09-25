@@ -40,6 +40,8 @@ const checkSeatAvailability = async (req, res) => {
         const availableSeats = showing.availableSeats
             .filter(seat => seat.available)
             .map(seat => ({
+                _id: seat._id,
+    
                 name: seat.name,
                 price: seat.price,
                 type: seat.type
