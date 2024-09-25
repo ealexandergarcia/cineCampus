@@ -7,10 +7,10 @@
     </button>
     <h1 class="font-poppins font-bold mb-10 text-3xl mr-32">Create account</h1>
     <form @submit.prevent="createAccount">
-      <div class="relative w-80">
+      <div class="relative w-full">
         <p class="font-inter font-regular text-left mb-1.5 text-sm">Username</p>
         <input
-          class="border border-slate-0 rounded-lg mb-6 px-4 py-2 w-80 bg-color1 text-black"
+          class="border border-slate-0 rounded-lg mb-6 px-4 py-2 w-full bg-color1 text-black"
           type="text"
           v-model="formData.nick"
           id="nick"
@@ -18,10 +18,10 @@
           required
         />
       </div>
-      <div class="relative w-80">
+      <div class="relative w-full">
         <p class="font-inter font-regular text-left mb-1.5 text-sm">Email</p>
         <input
-          class="border border-slate-0 rounded-lg mb-6 px-4 py-2 w-80 bg-color1 text-black"
+          class="border border-slate-0 rounded-lg mb-6 px-4 py-2 w-full bg-color1 text-black"
           type="email"
           v-model="formData.email"
           id="email"
@@ -30,10 +30,10 @@
         />
       </div>
       
-      <div class="relative mb-6 w-80">
+      <div class="relative mb-6 w-full">
         <p class="text-left font-inter font-regular mb-1.5 text-sm">Password</p>
         <input
-          class="border border-slate-0 rounded-lg px-4 py-2 w-80 bg-color1 text-black"
+          class="border border-slate-0 rounded-lg px-4 py-2 w-full bg-color1 text-black"
           :type="passwordVisible ? 'text' : 'password'"
           v-model="formData.password"
           id="password"
