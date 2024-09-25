@@ -24,34 +24,43 @@ const User = require('../models/usersModel');
  */
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
-
+  
     if (!email || !password) {
-        return res.status(400).json({ message: 'Faltan credenciales' });
+      return res.status(400).json({ message: 'Faltan credenciales' });
     }
-
+  
     try {
-        // Find the user by email
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(401).json({ message: 'Usuario no encontrado' });
-        }
-
-        // Compare passwords
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Contraseña incorrecta' });
-        }
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.cookie("prueba",JSON.stringify({name:"miguel"}, {maxAge: 5000}));
-        res.status(200).json({ token });
-        console.log(res);
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(401).json({ message: 'Usuario no encontrado' });
+      }
+  
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Contraseña incorrecta' });
+      }
+  
+      // Genera el token JWT
+      const token = jwt.sign(
+        { id: user._id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+  
+      // Configura la cookie correctamente
+      res.cookie('token', token, {
+        httpOnly: true,  // Impide acceso desde JavaScript en el navegador
+        secure: false,   // Cambiar a true en producción (HTTPS)
+        maxAge: 60 * 60 * 1000,  // 1 hora
+        sameSite: 'Strict' // Protege contra ataques CSRF
+      });
+  
+      res.status(200).json({ message: 'Inicio de sesión exitoso', token });
     } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        res.status(500).json({ message: 'Error en el servidor' });
+      console.error('Error al iniciar sesión:', error);
+      res.status(500).json({ message: 'Error en el servidor' });
     }
-};
+  };
 
 module.exports = { loginUser };
