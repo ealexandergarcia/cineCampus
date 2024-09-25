@@ -1,6 +1,6 @@
 <template>
   <div class="bg-[#121212] min-h-screen flex flex-col">
-    <CinemaHeader title="Cinema Selection" />
+    <CinemaHeader title="Cinema Selection" homeRoute="/home" />
   </div>
 </template>
 
