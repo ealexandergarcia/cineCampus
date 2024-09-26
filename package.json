@@ -24,6 +24,7 @@
     "express": "^4.19.2",
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "mongoose": "^8.6.0",
     "mvc": "file:",
     "passport": "^0.7.0",
