@@ -2,8 +2,8 @@
   <div class="bg-[#121212] min-h-screen flex flex-col">
     <Header />
     <main class="flex-grow">
-        <NowPlayingCarousel />
-        <ComingSoon/>
+      <NowPlayingCarousel />
+      <ComingSoon />
     </main>
     <Footer />
   </div>
@@ -14,10 +14,13 @@ import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
 import NowPlayingCarousel from "../components/NowPlayingCarousel.vue";
 import ComingSoon from "../components/ComingSoon.vue";
-// import MovieList from './components/MovieList.vue'
 
 export default {
-  components: { Header, Footer, NowPlayingCarousel, ComingSoon}
+  components: { Header, Footer, NowPlayingCarousel, ComingSoon },
+  mounted() {
+    // Eliminar el ID del sessionStorage al cargar el componente
+    sessionStorage.removeItem('selectedMovieId');
+  }
 }
 </script>
 

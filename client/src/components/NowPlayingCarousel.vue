@@ -5,7 +5,7 @@
       <span class="see-all flex items-end text-sm font-semibold">See all</span>
     </h2>
     <Carousel :itemsToShow="1.8" :wrapAround="true" :transition="500">
-      <Slide v-for="movie in movies" :key="movie._id">
+      <Slide v-for="movie in movies" :key="movie._id" @click="selectMovie(movie._id)">
         <div class="carousel__item">
           <img :src="movie.poster || defaultImage" :alt="movie.title" class="movie-poster">
           <h3 class="movie-title" :title="movie.title">{{ movie.title }}</h3>
@@ -59,10 +59,15 @@ export default defineComponent({
       } catch (error) {
         console.error('Error fetching movies:', error);
       }
+    },
+    selectMovie(movieId) {
+      sessionStorage.setItem('selectedMovieId', movieId); // Guardar el ID en sessionStorage
+      this.$router.push('/cinema'); // Redirigir a la vista /cinema
     }
   },
 })
 </script>
+
 
 <style>
 .movie-carousel {
