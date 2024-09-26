@@ -39,6 +39,7 @@ const getMovies = async (req, res) => {
                     title: { $first: '$title' },
                     genre: { $first: '$genre' },
                     duration: { $first: '$duration' },
+                    poster:{ $first:'$poster'},
                     showings: {
                         $push: {
                             _id: '$showings._id',
