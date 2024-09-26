@@ -1,7 +1,7 @@
-// routes/moviesRoutes.js
 const express = require('express');
 const router = express.Router();
-const { getMovies,getMovieDetails } = require('../controllers/moviesController');
+const { getMovies, getMovieDetails, getComingSoonMovies } = require('../controllers/moviesController');
+
 /**
  * @route GET /movies/v1
  * @description Obtiene una lista de todas las películas disponibles en el catálogo,
@@ -19,4 +19,12 @@ router.get('/v1', getMovies);
  * @access Public
  */
 router.get('/v1/:id', getMovieDetails);
+
+/**
+ * @route GET /movies/coming-soon
+ * @description Obtiene una lista de todas las películas que están en estado "comingSoon".
+ * @access Public
+ */
+router.get('/coming-soon', getComingSoonMovies); // Nueva ruta para películas que están "coming soon"
+
 module.exports = router;
