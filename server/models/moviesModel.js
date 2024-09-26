@@ -19,7 +19,12 @@ const movieSchema = new mongoose.Schema({
   },
   poster:{
     type: String,
-  }
+  },
+  status: {
+    type: String,
+    enum: ['nowPlaying', 'comingSoon', 'expired'],
+    default: 'comingSoon'
+}
 });
 
 module.exports = mongoose.model('Movie', movieSchema);
