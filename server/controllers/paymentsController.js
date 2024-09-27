@@ -3,7 +3,9 @@ const Movement = require('../models/movementsModel');
 const Showing = require('../models/showingsModel');
 const Card = require('../models/cardsModel');
 const Room = require('../models/roomsModel');
+const mongoose = require('mongoose'); 
 const User = require('../models/usersModel');
+const { ObjectId } = require('mongodb');
 
 
 /**
@@ -195,61 +197,159 @@ const initiateReservationPayment = async (req, res) => {
 const updatePaymentStatus = async (req, res) => {
     try {
         const { paymentId } = req.params;
-        const { status } = req.body;
+        console.log(paymentId);
 
-        const payment = await Payment.findById(paymentId).populate('movement');
+        // Obtener status y paymentMethod del cuerpo de la solicitud
+        const { status, paymentMethod } = req.body;
+
+        // Buscar el pago por su ID
+        const payment = await Payment.findById(paymentId);
+        console.log(payment);
+
+        // Verificar si el pago existe
         if (!payment) {
             return res.status(404).json({ message: 'Payment not found' });
         }
 
-        if (payment.status === status) {
-            return res.status(400).json({ message: 'Payment status already updated' });
-        }
-
         let newMovementStatus;
 
-        if (status === 'accepted') {
-            newMovementStatus = 'purchased';
-        } else if (status === 'rejected' || status === 'cancelled') {
-            newMovementStatus = 'cancelled';
-
-            const showing = await Showing.findById(payment.movement.showing);
-            if (!showing) {
-                return res.status(404).json({ message: 'Showing not found' });
-            }
-
-            showing.availableSeats.forEach(seat => {
-                if (payment.movement.seats.includes(seat.name)) {
-                    seat.available = true;
-                }
-            });
-
-            await showing.save();
-        } else {
-            return res.status(400).json({ message: 'Invalid status' });
+        // Si existe el método de pago, actualizar el estado de pago
+        if (paymentMethod) {
+            payment.paymentMethod = paymentMethod;
         }
 
-        payment.status = status;
+        // Si existe el estado de pago, actualizar el estado
+        if (status) {
+            payment.status = status;
+
+            // Definir el nuevo estado del movimiento en función del estado del pago
+            if (status === 'purchased') {
+                newMovementStatus = 'purchased';
+            } else if (status === 'rejected') {
+                newMovementStatus = 'rejected';
+            } else if (status === 'cancelled') {
+                newMovementStatus = 'cancelled';
+            } else if (status === 'processing') {
+                newMovementStatus = 'processing';
+            }
+        }
+
+        // Guardar cambios en el pago
         await payment.save();
 
-        const newMovement = new Movement({
-            user: payment.movement.user,
-            showing: payment.movement.showing,
-            seats: payment.movement.seats,
-            date: payment.movement.date,
-            status: newMovementStatus
-        });
+        // Buscar el movimiento relacionado
+        const movement = await Movement.findById(payment.movement);
+        console.log(movement);
 
-        await newMovement.save();
+        // Verificar si el movimiento existe
+        if (!movement) {
+            return res.status(404).json({ message: 'Movement not found' });
+        }
 
-        res.status(200).json({ message: 'Payment updated and new movement created', payment, newMovement });
+        // Si hay un nuevo estado de movimiento, actualizarlo
+        if (newMovementStatus) {
+            movement.status = newMovementStatus;
+
+            // Agregar nuevo estado a la historia
+            movement.statusHistory.push({
+                status: newMovementStatus,
+                date: new Date(), // Puedes ajustar esta fecha si lo necesitas
+            });
+
+            // Guardar cambios en el movimiento
+            await movement.save();
+        }
+
+        // Responder con éxito
+        res.status(200).json({ message: 'Payment updated and movement status changed', payment, movement });
     } catch (error) {
         console.error('Error updating payment status:', error);
         res.status(500).json({ message: 'Error updating payment status', error: error.message });
     }
 };
 
+const getPaymentDetails = async (req, res) => {
+    try {
+      const { paymentId } = req.params;
+      
+      // Verificar si el paymentId es un ObjectId válido
+      if (!mongoose.Types.ObjectId.isValid(paymentId)) {
+        return res.status(400).json({ message: 'Invalid payment ID' });
+      }
+      
+      console.log('paymentId recibido:', paymentId);
+      
+      const paymentDetails = await Payment.aggregate([
+        { $match: { _id: new ObjectId(paymentId) } }, // Convertir el paymentId a ObjectId
+        {
+          $lookup: {
+            from: 'movements',
+            localField: 'movement',
+            foreignField: '_id',
+            as: 'movementDetails'
+          }
+        },
+        { $unwind: { path: '$movementDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'showings',
+            localField: 'movementDetails.showing',
+            foreignField: '_id',
+            as: 'showingDetails'
+          }
+        },
+        { $unwind: { path: '$showingDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'movies',
+            localField: 'showingDetails.movie',
+            foreignField: '_id',
+            as: 'movieDetails'
+          }
+        },
+        { $unwind: { path: '$movieDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'rooms',
+            localField: 'showingDetails.room',
+            foreignField: '_id',
+            as: 'roomDetails'
+          }
+        },
+        { $unwind: { path: '$roomDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            _id: 1,
+            amount: 1,
+            paymentMethod: 1,
+            status: 1,
+            movement: '$movementDetails._id',
+            user: '$movementDetails.user',
+            seats: '$movementDetails.seats',
+            movie: '$movieDetails.title',
+            poster: '$movieDetails.poster',
+            room: '$roomDetails.name',
+            showingTime: '$showingDetails.datetime',
+          }
+        }
+      ]);
+  
+      console.log('paymentDetails:', paymentDetails);
+  
+      if (!paymentDetails || paymentDetails.length === 0) {
+        return res.status(404).json({ message: 'Payment not found' });
+      }
+  
+      res.status(200).json({ message: 'Payment details retrieved', payment: paymentDetails[0] });
+    } catch (error) {
+      console.error('Error fetching payment details:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
+
+
 module.exports = {
     initiateReservationPayment,
-    updatePaymentStatus
+    updatePaymentStatus,
+    getPaymentDetails   
 };

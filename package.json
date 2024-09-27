@@ -1,9 +1,16 @@
 {
   "name": "mvc",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "node --watch --env-file .env server.js"
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "vite",
+    "dev:server": "node --watch --env-file .env ./server.js",
+    "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
+    "start:client": "cd client && npm run build && npm run preview",
+    "start:server": "cd server && node --watch --env-file .env ./server.js",
+    "build": "cd client && npm run build",
+    "preview": "cd client && npm run preview"
   },
   "keywords": [],
   "author": "",
@@ -11,13 +18,27 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "concurrently": "^8.0.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "express-validator": "^7.2.0",
+    "jsbarcode": "^3.11.6",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "mongoose": "^8.6.0",
     "mvc": "file:",
     "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "vue": "^3.5.8",
+    "vue-router": "^4.4.5",
+    "vue3-carousel": "^0.3.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.12",
+    "vite": "^5.4.1"
   }
 }

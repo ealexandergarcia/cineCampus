@@ -12,7 +12,7 @@ const Showtime = require('../models/showingsModel'); // Modelo de horarios
  */
 const getMovies = async (req, res) => {
     try {
-        const today = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+        const today = new Date(); // Fecha actual como objeto Date
         const movies = await Movie.aggregate([
             {
                 $lookup: {
@@ -30,7 +30,7 @@ const getMovies = async (req, res) => {
             },
             {
                 $match: {
-                    'showings.date': { $gte: today }
+                    'showings.datetime': { $gte: today } // Filtramos usando datetime
                 }
             },
             {
@@ -39,11 +39,12 @@ const getMovies = async (req, res) => {
                     title: { $first: '$title' },
                     genre: { $first: '$genre' },
                     duration: { $first: '$duration' },
+                    poster: { $first: '$poster' },
                     showings: {
                         $push: {
                             _id: '$showings._id',
-                            date: '$showings.date',
-                            time: '$showings.time'
+                            date: { $dateToString: { format: "%Y-%m-%d", date: '$showings.datetime' } }, // Extraer fecha
+                            time: { $dateToString: { format: "%H:%M", date: '$showings.datetime' } } // Extraer hora
                         }
                     }
                 }
@@ -55,6 +56,7 @@ const getMovies = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving movies' });
     }
 };
+
 
 /**
  * Obtiene los detalles completos de una película específica según su id,
@@ -80,7 +82,25 @@ const getMovieDetails = async (req, res) => {
     }
 };
 
+/**
+ * Obtiene una lista de todas las películas que están en estado "comingSoon".
+ *
+ * @param {Object} req - La solicitud HTTP.
+ * @param {Object} res - La respuesta HTTP.
+ * @returns {Promise<void>}
+ */
+const getComingSoonMovies = async (req, res) => {
+    try {
+        const movies = await Movie.find({ status: 'comingSoon' });
+
+        res.status(200).json(movies);
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving coming soon movies' });
+    }
+};
+
 module.exports = {
     getMovies,
-    getMovieDetails
+    getMovieDetails,
+    getComingSoonMovies
 };

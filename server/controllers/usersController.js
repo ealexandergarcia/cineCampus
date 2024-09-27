@@ -64,24 +64,26 @@ const handleAsync = require('../utils/handleAsync');
  * }
  */
 exports.createUser = handleAsync(async (req, res) => {
-    const { name, email, password, phone, role } = req.body;
-
-    const existingUser = await User.findOne({ name });
+    const { nick,name,email, password, phone, role } = req.body;
+   // Verificar si el email ya está en uso
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
         return res.status(400).json({ message: 'El correo electrónico ya está registrado' });
     }
+
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Crea el nuevo usuario
     const newUser = new User({
+        nick,
         name,
         email,
         password: hashedPassword,
-        phone,
-        role
-    });
+        phone: phone || null, // Asegúrate de establecer en null si no se proporciona
+        role: 'standard'
+    });    
 
     try {
         // Si el rol es VIP, asignar una tarjeta automáticamente
@@ -101,12 +103,12 @@ exports.createUser = handleAsync(async (req, res) => {
         const client = mongoose.connection.client;
         const adminDb = client.db('cineCampus');
         await adminDb.command({
-            createUser: name,
+            createUser: nick,
             pwd: password,
             roles: [{ role: role, db: 'cineCampus' }]
         });
 
-        res.status(201).json({ message: 'Usuario creado con éxito', user: newUser });
+        res.status(201).json({ message: 'User registered successfully', user: newUser });
     } catch (error) {
         console.error('Error al guardar el usuario:', error.message);
         res.status(500).json({ message: 'Error al crear el usuario', error: error.message });

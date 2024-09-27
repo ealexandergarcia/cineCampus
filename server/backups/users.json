@@ -1,59 +1,236 @@
 [{
   "_id": {
-    "$oid": "66d10e4b4eb032980fd94689"
+    "$oid": "66d84bf7e387e509761a36ff"
   },
-  "role": "VIP",
-  "name": "John Doe",
-  "email": "john.doe@example.com",
-  "password": "123",
-  "phone": "+1234567890",
-  "card": {
-    "$oid": "66d10e164eb032980fd94687"
-  }
-},
-{
-  "_id": {
-    "$oid": "66d10e4b4eb032980fd9468a"
-  },
-  "role": "standard",
-  "name": "Jane Smith",
-  "email": "jane.smith@example.com",
-  "password": "123",
-  "phone": "+0987654321",
-  "card": null
-},
-{
-  "_id": {
-    "$oid": "66d559a260d084674f879d5c"
-  },
-  "role": "standard",
-  "name": "Edwin",
-  "email": "edwin@example.com",
-  "password": "1234",
-  "phone": "+54",
-  "card": {
-    "$oid": "66d57050f63220b086ebfc6c"
-  }
-},
-{
-  "_id": {
-    "$oid": "66d652edf94d1bc6817c7dcf"
-  },
-  "name": "Juan Prez",
-  "email": "ssssss@example.com",
-  "password": "$2a$10$djDJ4gURjtSpkDRM4PCxreK7.wTuxpS2I6TTlWCQTxyWqgeBN7EqK",
+  "name": "Juan",
+  "email": "jua3@example.com",
+  "password": "$2a$10$Etooc72CJCtqR.QM3k84Q.CoOmaxTnTxj.HD/bHT8VsredkzDXU1C",
   "phone": "1234567890",
-  "role": "VIP",
+  "role": "standard",
   "__v": 0
 },
 {
   "_id": {
-    "$oid": "66d7a680f4e4aefee64a8925"
+    "$oid": "66d84f180e21582aecf69d7c"
   },
-  "name": "Edax",
-  "email": "Edax@example.com",
-  "password": "$2a$10$25ov2EV9wX.ctf5ZGFxLEOenlUCSz9d5BIlT8Iqo7bZ9trmt8s8ay",
+  "name": "s",
+  "email": "jua4@example.com",
+  "password": "$2a$10$0ED47zhny4MfjBb4Wgn8tu8/5jsXAIDm8ndGrKFA04TKSocorEkOS",
+  "phone": "1234567890",
+  "role": "adminCine",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d8517d109a314586830c2f"
+  },
+  "name": "s",
+  "email": "jua5@example.com",
+  "password": "$2a$10$GcixV2FmqetG89cJuhjFYOOT8hWAbIBnYHpHSYi.wgAKoo9PiU6iy",
   "phone": "1234567890",
   "role": "VIP",
+  "card": {
+    "$oid": "66d57050f63220b086ebfc6c"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d8577dad8f19e423130086"
+  },
+  "name": "Edwin",
+  "email": "Edwin@example.com",
+  "password": "$2a$10$/S4URjH9xEGXEuZnQgsXj.sCsE7haB1PVXUPm.Tpng.H2XhSzyYQO",
+  "phone": "1234567890",
+  "role": "cineAdmin",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d8578cad8f19e42313008a"
+  },
+  "name": "Edwin",
+  "email": "Edwinn@example.com",
+  "password": "$2a$10$khXgvQpJCvcaUD6frKE2Y.IreLvoy8KZpLlS0MW0BD1bm1Q9kJjUC",
+  "phone": "1234567890",
+  "role": "adminCine",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d858c0fc997b2fe9ae2599"
+  },
+  "name": "Edwin",
+  "email": "alex@example.com",
+  "password": "$2a$10$P4fTISTlBud3hIMFPt8Qduwyjf3y2ENSJyqgX6k.ed4wIMhKC4cHO",
+  "phone": "1234567890",
+  "role": "adminCine",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d85966fdf0f0000a4fe97e"
+  },
+  "name": "EdwinG",
+  "email": "alex2@example.com",
+  "password": "$2a$10$uOqCq.EJNPzyhdp0q/jbEumB8uKNhjzHMELxgZlOmt6cpyeI7jhVW",
+  "phone": "1234567890",
+  "role": "adminCine",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d859d66cd2f0b726c8a785"
+  },
+  "name": "EdwinGP",
+  "email": "alex2s@example.com",
+  "password": "$2a$10$c5VzrtxfcwNA6wB9r5TVD.AdJ.oUd/YjLobniD5PJAR6v3SKitui.",
+  "phone": "1234567890",
+  "role": "VIP",
+  "card": {
+    "$oid": "66d10e164eb032980fd94687"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d85dc9155d3f499cb88bd7"
+  },
+  "name": "Miguel",
+  "email": "Miguel@example.com",
+  "password": "$2a$10$vDuZn8uSAzWR1S2sLrIfr.qrE22IVi6ys6zh0RmzpOmbEjSoErQdi",
+  "phone": "1234567890",
+  "role": "VIP",
+  "card": {
+    "$oid": "66d57050f63220b086ebfc6c"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d99232eb235c6cd35494af"
+  },
+  "name": "Karen",
+  "email": "Karen@example.com",
+  "password": "$2a$10$YUOLKeIpJyL0h9tZ4M12jORCwZxZ55FFysBZkioCSRW9pxo6U4N/6",
+  "phone": "1234567890",
+  "role": "adminCine",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d99256abe9bc606e9d67b5"
+  },
+  "name": "AlexG",
+  "email": "AlexG@example.com",
+  "password": "$2a$10$lhiRKQsw1yQqtAsW2cmlw.suZiCoby0JE.OuE9nqnlB3fNnWfL3KK",
+  "phone": "1234567890",
+  "role": "VIP",
+  "card": {
+    "$oid": "66d57050f63220b086ebfc6c"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66d99262abe9bc606e9d67b9"
+  },
+  "name": "EdwinP",
+  "email": "EdwinP@example.com",
+  "password": "$2a$10$ZgtcwKqQ4qATdSb4e1q9FeueXqVHOA2LvZcbjK0AWbnPbbYTGFxoS",
+  "phone": "1234567890",
+  "role": "standard",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66dedfaf4352883af38f788a"
+  },
+  "name": "EdwinPsss",
+  "email": "AlexsssG@example.com",
+  "password": "$2a$10$8R.5pIFohM6lbMMyOd2aceH1qlcTDkxbDhfNM1oTvzUorXvrBTiuC",
+  "phone": "1234567890",
+  "role": "adminCine",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66dedfbd4352883af38f7891"
+  },
+  "name": "EdwinPssssss",
+  "email": "AlexssssG@example.com",
+  "password": "$2a$10$pIWclHGbaP05M3RCfDQlPOvnZ2VnjzUOgdDU5ogoXnm1hp8xa4LMu",
+  "phone": "1234567890",
+  "role": "VIP",
+  "card": {
+    "$oid": "66d10e164eb032980fd94688"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66dedfc54352883af38f7895"
+  },
+  "name": "sss",
+  "email": "AlexssssssssG@example.com",
+  "password": "$2a$10$/9GVpu7HU290TTEN0c0YW.VkEro/Pj5/JkiY3g1MGXl.LuuG0zdVe",
+  "phone": "1234567890",
+  "role": "standard",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e035abb5d00b4be765bc88"
+  },
+  "name": "Karen2",
+  "email": "Karen2@example.com",
+  "password": "$2a$10$qke/ZxvZl2cEkU9IIuxMOOIF4QftcLyX5D6H2aR/mwKYJyinh18N6",
+  "phone": "123456789013",
+  "role": "adminCine",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e035d8f0b8589dad067b81"
+  },
+  "name": "Miguel2",
+  "email": "Miguel2@example.com",
+  "password": "$2a$10$rcdybIo98FSWCuSHqZ6dq.TmSqr5EleFcPmkOCqoYdgsWqV.Z3SFa",
+  "phone": "123456789013",
+  "role": "standard",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66e035e6f0b8589dad067b85"
+  },
+  "name": "Juan2",
+  "email": "Juan2@example.com",
+  "password": "$2a$10$QHue62Lkg.PhnPYiaVBA0.OmK5SIVhbPT6kf/5MIkyDpvxrYn63IS",
+  "phone": "123456789013",
+  "role": "VIP",
+  "card": {
+    "$oid": "66d10e164eb032980fd94687"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f2be7d56ec9e79c5e014b2"
+  },
+  "nick": "prueba23",
+  "email": "prueba23@sa.com",
+  "password": "$2a$10$ALdy9eU88hrbHQNINX76sObVembvsWJzX.jBEAoC92ANg11/qsxaW",
+  "role": "standard",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "66f2c32b97722333b51fe9f8"
+  },
+  "nick": "hello",
+  "email": "hello@gmail.com",
+  "password": "$2a$10$r78vk.F5r4PNPfNI164MKO.X8.Yq1pnN1nnPislxq6V2zL.suvLli",
+  "role": "standard",
   "__v": 0
 }]

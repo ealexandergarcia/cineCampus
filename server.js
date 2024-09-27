@@ -15,7 +15,12 @@ const confirmationRoutes = require('./server/routes/confirmationRoutes');
 
 
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Conectar a la base de datos

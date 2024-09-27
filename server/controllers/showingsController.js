@@ -1,58 +1,93 @@
 const Showing = require('../models/showingsModel');
+const Room = require('../models/roomsModel'); // Asegúrate de importar el modelo de la sala
+const { ObjectId } = require('mongodb');
 
 /**
- * checkSeatAvailability - Checks the availability of seats for a specific showing.
+ * checkSeatAvailability - Checks the availability of seats for a specific movie on specific dates.
  *
  * @param {Object} req - Express request object.
  * @param {Object} req.params - Request parameters.
- * @param {String} req.params.id - ID of the showing to check.
+ * @param {String} req.params.movieId - ID of the movie to check.
  * @param {Object} req.query - Query parameters.
  * @param {String} req.query.date - Date of the showing to check.
  * @param {Object} res - Express response object.
  *
- * @returns {Object} JSON with the available seats or an error message.
+ * @returns {Object} JSON with showing details or an error message.
  *
- * @throws {Error} If the showing is not found or there is a server error.
- *
- * @description
- * This function performs the following actions:
- * 1. Retrieves the showing ID from the request parameters and the date from the query.
- * 2. Finds the showing by its ID.
- * 3. Checks if the showing exists; if not, responds with a 404 error indicating that the showing was not found.
- * 4. Filters the available seats to include only those that are marked as available.
- * 5. Maps the available seats to include only the name, price, and type of each seat.
- * 6. Responds with a 200 status and JSON containing the showing ID, date, and a list of available seats.
- * 7. Catches any errors and responds with a 500 status and a server error message.
+ * @throws {Error} If there is a server error.
  */
 const checkSeatAvailability = async (req, res) => {
-    const { id } = req.params;
-    const { date } = req.query;
+    const { movieId } = req.params;
+    const { date } = req.query; // Assuming date is passed as a query parameter (optional)
+
+    // Parse the query date or use today as default
+    const queryDate = date ? new Date(date) : new Date();
 
     try {
-        // Find the showing by ID
-        const showing = await Showing.findById(id);
+        // Build the aggregation pipeline
+        const result = await Showing.aggregate([
+            {
+                $match: {
+                    movie: new ObjectId(movieId), // Usar ObjectId desde params
+                    datetime: { $gte: queryDate } // Filtrar por datetime mayor o igual a la fecha de consulta
+                }
+            },
+            {
+                $lookup: {
+                    from: 'rooms', // Nombre de la colección de salas
+                    localField: 'room', // Campo de referencia en 'showings'
+                    foreignField: '_id', // Campo de referencia en 'rooms'
+                    as: 'roomDetails' // Nombre del campo que contendrá los datos de la sala
+                }
+            },
+            {
+                $unwind: {
+                    path: '$roomDetails', // Descomponer el array de detalles de sala
+                    preserveNullAndEmptyArrays: false // Asegúrate de que hay siempre un detalle de sala
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        date: { $dateToString: { format: "%Y-%m-%d", date: "$datetime" } }, // Extraer fecha
+                        time: { $dateToString: { format: "%H:%M", date: "$datetime" } } // Extraer hora
+                    },
+                    showingIds: { $push: "$_id" }, // Almacenar los IDs de las funciones
+                    availableSeats: { $push: "$availableSeats" },
+                    room: { $first: "$roomDetails" } // Obtener los detalles de la sala
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: "$_id.date",
+                    time: "$_id.time",
+                    showingIds: "$showingIds",
+                    availableSeats: {
+                        $reduce: {
+                            input: "$availableSeats",
+                            initialValue: [],
+                            in: { $concatArrays: ["$$value", "$$this"] }
+                        }
+                    },
+                    room: { // Proyectar los detalles de la sala
+                        name: "$room.name",
+                        price: "$room.price"
+                    }
+                }
+            },
+            {
+                $sort: { date: 1, time: 1 }
+            }
+        ]);
 
-        // Check if the showing exists
-        if (!showing) {
-            return res.status(404).json({ message: 'Showing not found' });
+        // Check if there are no results
+        if (!result.length) {
+            return res.status(404).json({ message: 'No showings found for this movie' });
         }
 
-        const availableSeats = showing.availableSeats
-            .filter(seat => seat.available)
-            .map(seat => ({
-                _id: seat._id,
-    
-                name: seat.name,
-                price: seat.price,
-                type: seat.type
-            }));
-
-        // Respond with seat availability
-        res.status(200).json({
-            id,
-            date,
-            seats: availableSeats
-        });
+        // Respond with showing details
+        res.status(200).json(result);
     } catch (error) {
         console.error('Error checking seat availability:', error);
         res.status(500).json({ message: 'Server error' });

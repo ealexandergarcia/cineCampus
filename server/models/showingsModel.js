@@ -11,12 +11,8 @@ const showingSchema = new mongoose.Schema({
     ref: 'Room',
     required: true
   },
-  date: {
+  datetime: {
     type: Date,
-    required: true
-  },
-  time: {
-    type: String,
     required: true
   },
   availableSeats: [

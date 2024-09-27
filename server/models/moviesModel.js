@@ -1,5 +1,22 @@
 const mongoose = require('mongoose');
 
+// Definición del esquema para un actor
+const actorSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  role: {
+    type: String,
+    required: true
+  },
+  photo: {
+    type: String,
+    required: true // URL de la foto del actor
+  }
+});
+
+// Definición del esquema principal para una película
 const movieSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -13,18 +30,20 @@ const movieSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  poster: {
+    type: String,
+  },
   synopsis: {
     type: String,
-    required: true
+    required: true // Sinopsis de la película
   },
   status: {
     type: String,
-    enum: ['available', 'in_theaters', 'coming_soon'],
-    default: 'available'
+    enum: ['nowPlaying', 'comingSoon', 'expired'],
+    default: 'comingSoon'
   },
-  genre: [String] // Array of genres
+  cast: [actorSchema] // Campo para el reparto
 });
 
-const Movie = mongoose.model('Movie', movieSchema);
-
-module.exports = Movie;
+// Exportar el modelo de película
+module.exports = mongoose.model('Movie', movieSchema);

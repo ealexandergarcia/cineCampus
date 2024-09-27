@@ -1,9 +1,13 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+    nick:{
+        type: String,
+        required: true,
+        unique: true
+    },
     name: {
         type: String,
-        required: true
     },
     email: {
         type: String,
@@ -16,7 +20,8 @@ const userSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: true
+        unique: false, // Asegúrate de que esto esté configurado correctamente
+        default: null // Permite que sea nulo
     },
     role: {
         type: String,

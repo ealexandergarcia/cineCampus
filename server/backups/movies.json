@@ -2,25 +2,124 @@
   "_id": {
     "$oid": "66d10e5a4eb032980fd9468b"
   },
-  "title": "Inception",
+  "title": "Transformers: 40th Anniversary Event",
   "genre": [
     "Sci-Fi",
     "Thriller"
   ],
   "director": "Christopher Nolan",
   "duration": 148,
-  "synopsis": "A thief who steals corporate secrets through the use of dream-sharing technology is given a chance to have his criminal history erased if he can successfully implant an idea into a target's subconscious."
+  "synopsis": "A thief who steals corporate secrets through the use of dream-sharing technology is given a chance to have his criminal history erased if he can successfully implant an idea into a target's subconscious.",
+  "poster": "https://m.media-amazon.com/images/M/MV5BMTgwMjE5OWUtMTgwMi00MDAxLWJjMzQtZWJiZWI5OTBjNjdhXkEyXkFqcGdeQXVyNDY1NTEzNDc@._V1_SX300.jpg",
+  "status": "nowPlaying"
 },
 {
   "_id": {
     "$oid": "66d10e5a4eb032980fd9468c"
   },
-  "title": "The Matrix",
+  "title": "Transformers One",
   "genre": [
     "Action",
     "Sci-Fi"
   ],
   "director": "Wachowskis",
   "duration": 136,
-  "synopsis": "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers."
+  "synopsis": "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.",
+  "poster": "https://m.media-amazon.com/images/M/MV5BZWI1ZDY1YTQtMjRkNy00ZDZhLWE3OTItMTIwNzliY2Y1MTZhXkEyXkFqcGc@._V1_SX300.jpg",
+  "status": "nowPlaying"
+},
+{
+  "_id": {
+    "$oid": "66f552f81a6cb0ed9b4ffe27"
+  },
+  "title": "Transformers: Rise of the Beasts",
+  "genre": [
+    "Sci-Fi",
+    "Thriller"
+  ],
+  "director": "Christopher Nolan",
+  "duration": 148,
+  "synopsis": "A thief who steals corporate secrets through the use of dream-sharing technology is given a chance to have his criminal history erased if he can successfully implant an idea into a target's subconscious.",
+  "poster": "https://m.media-amazon.com/images/M/MV5BZTVkZWY5MmItYjY3OS00OWY3LTg2NWEtOWE1NmQ4NGMwZGNlXkEyXkFqcGc@._V1_SX300.jpg",
+  "status": "comingSoon"
+},
+{
+  "_id": {
+    "$oid": "66f555341a6cb0ed9b4ffe28"
+  },
+  "title": "Operation: Santa - A Transformers Unity Christmas Special",
+  "genre": [
+    "Sci-Fi",
+    "Thriller"
+  ],
+  "director": "Christopher Nolan",
+  "duration": 148,
+  "synopsis": "A thief who steals corporate secrets through the use of dream-sharing technology is given a chance to have his criminal history erased if he can successfully implant an idea into a target's subconscious.",
+  "poster": "https://m.media-amazon.com/images/M/MV5BODFlZWRiNTctMDNiYy00Yjk3LWEzMzktMmZhMzE2NDI2MWZmXkEyXkFqcGdeQXVyMzc1MDQyNTM@._V1_SX300.jpg",
+  "status": "comingSoon"
+},
+{
+  "_id": {
+    "$oid": "66f55f331a6cb0ed9b4ffe29"
+  },
+  "title": "Transformers: 40th Anniversary Event",
+  "genre": [
+    "Sci-Fi",
+    "Thriller"
+  ],
+  "director": "Christopher Nolan",
+  "duration": 148,
+  "synopsis": "A thief who steals corporate secrets through the use of dream-sharing technology is given a chance to have his criminal history erased if he can successfully implant an idea into a target's subconscious.",
+  "poster": "https://m.media-amazon.com/images/M/MV5BMTgwMjE5OWUtMTgwMi00MDAxLWJjMzQtZWJiZWI5OTBjNjdhXkEyXkFqcGdeQXVyNDY1NTEzNDc@._V1_SX300.jpg",
+  "status": "nowPlaying",
+  "cast": [
+    {
+      "name": "Leonardo DiCaprio",
+      "role": "Cobb",
+      "photo": "https://link_to_photo.com/leonardo.jpg"
+    },
+    {
+      "name": "Joseph Gordon-Levitt",
+      "role": "Arthur",
+      "photo": "https://link_to_photo.com/joseph.jpg"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "66f55ff21a6cb0ed9b4ffe2a"
+  },
+  "title": "Puss in Boots: The Last Wish",
+  "genre": [
+    "Adventure",
+    "Animation",
+    "Fantasy"
+  ],
+  "director": "Joel Crawford",
+  "duration": 102,
+  "synopsis": "Puss in Boots discovers that his passion for adventure has taken its toll: he has burned through eight of his nine lives. Puss sets off on an epic journey to find the mythical Last Wish and restore his nine lives.",
+  "poster": "https://pbs.twimg.com/media/FjTWjZPXEAcqy5n?format=jpg&name=large",
+  "status": "comingSoon",
+  "cast": [
+    {
+      "name": "Antonio Banderas",
+      "role": "Puss in Boots",
+      "photo": "https://link_to_photo.com/antonio.jpg"
+    },
+    {
+      "name": "Salma Hayek",
+      "role": "Kitty Softpaws",
+      "photo": "https://link_to_photo.com/salma.jpg"
+    },
+    {
+      "name": "Harvey Guillén",
+      "role": "Perro",
+      "photo": "https://link_to_photo.com/harvey.jpg"
+    },
+    {
+      "name": "Florence Pugh",
+      "role": "Goldilocks",
+      "photo": "https://link_to_photo.com/florence.jpg"
+    }
+  ]
 }]
