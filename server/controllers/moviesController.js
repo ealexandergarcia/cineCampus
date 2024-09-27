@@ -39,6 +39,7 @@ const getMovies = async (req, res) => {
                     title: { $first: '$title' },
                     genre: { $first: '$genre' },
                     duration: { $first: '$duration' },
+                    poster:{ $first:'$poster'},
                     showings: {
                         $push: {
                             _id: '$showings._id',
@@ -80,7 +81,25 @@ const getMovieDetails = async (req, res) => {
     }
 };
 
+/**
+ * Obtiene una lista de todas las películas que están en estado "comingSoon".
+ *
+ * @param {Object} req - La solicitud HTTP.
+ * @param {Object} res - La respuesta HTTP.
+ * @returns {Promise<void>}
+ */
+const getComingSoonMovies = async (req, res) => {
+    try {
+        const movies = await Movie.find({ status: 'comingSoon' });
+
+        res.status(200).json(movies);
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving coming soon movies' });
+    }
+};
+
 module.exports = {
     getMovies,
-    getMovieDetails
+    getMovieDetails,
+    getComingSoonMovies
 };

@@ -81,9 +81,9 @@ exports.createUser = handleAsync(async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        phone,
+        phone: phone || null, // Asegúrate de establecer en null si no se proporciona
         role: 'standard'
-    });
+    });    
 
     try {
         // Si el rol es VIP, asignar una tarjeta automáticamente

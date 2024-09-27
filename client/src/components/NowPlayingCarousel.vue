@@ -5,11 +5,11 @@
       <span class="see-all flex items-end text-sm font-semibold">See all</span>
     </h2>
     <Carousel :itemsToShow="1.8" :wrapAround="true" :transition="500">
-      <Slide v-for="movie in movies" :key="movie.id">
+      <Slide v-for="movie in movies" :key="movie._id" @click="selectMovie(movie._id)">
         <div class="carousel__item">
-          <img :src="movie.image" :alt="movie.title" class="movie-poster">
-          <h3 class="movie-title" title="{{ movie.title }}">{{ movie.title }}</h3> <!-- Tooltip -->
-          <p class="movie-genre">{{ movie.genre }}</p>
+          <img :src="movie.poster || defaultImage" :alt="movie.title" class="movie-poster">
+          <h3 class="movie-title" :title="movie.title">{{ movie.title }}</h3>
+          <p class="movie-genre">{{ movie.genre.join(', ') }}</p>
         </div>
       </Slide>
       <template #addons>
@@ -21,8 +21,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { Carousel, Slide, Navigation, Pagination } from 'vue3-carousel'
-
+import { Carousel, Slide, Pagination } from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
 
 export default defineComponent({
@@ -31,46 +30,44 @@ export default defineComponent({
     Carousel,
     Slide,
     Pagination,
-    Navigation,
   },
   data() {
     return {
-      movies: [
-        {
-          id: 1,
-          title: 'Avatar: The Way of Water',
-          genre: 'Science Fiction',
-          image: 'src/assets/img/avatar.png',
-        },
-        {
-          id: 2,
-          title: 'Puss in Boots: The Last Wish',
-          genre: 'Adventure',
-          image: 'src/assets/img/gato.png',
-        },
-        {
-          id: 3,
-          title: 'Fast X',
-          genre: 'Action',
-          image: 'src/assets/img/rapido.png',
-        },
-        {
-          id: 4,
-          title: 'Fast X',
-          genre: 'Action',
-          image: 'src/assets/img/rapido.png',
-        },
-        {
-          id: 5,
-          title: 'Fast X',
-          genre: 'Action',
-          image: 'src/assets/img/rapido.png',
-        },
-      ],
+      movies: [],
+      defaultImage: 'src/assets/img/default_poster.png' // Ruta de la imagen por defecto
+    }
+  },
+  mounted() {
+    this.fetchMovies();
+  },
+  methods: {
+    async fetchMovies() {
+      try {
+        const response = await fetch('http://localhost:5000/movies/v1'); // Obtener las películas
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+
+        // Procesar la data para ajustar el formato
+        this.movies = data.map(movie => ({
+          _id: movie._id,
+          title: movie.title,
+          genre: movie.genre,
+          poster: movie.poster || '', // Asigna poster o una cadena vacía si no existe
+        }));
+      } catch (error) {
+        console.error('Error fetching movies:', error);
+      }
+    },
+    selectMovie(movieId) {
+      sessionStorage.setItem('selectedMovieId', movieId); // Guardar el ID en sessionStorage
+      this.$router.push('/cinema'); // Redirigir a la vista /cinema
     }
   },
 })
 </script>
+
 
 <style>
 .movie-carousel {

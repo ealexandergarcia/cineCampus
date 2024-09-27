@@ -87,6 +87,7 @@ export default {
       nick: '',
       email: '',
       password: '',
+      role:'standard'
     });
     const agree = ref(false);
     const passwordVisible = ref(false);
