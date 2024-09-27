@@ -1,6 +1,17 @@
 <template>
     <section class="w-screen h-screen flex flex-col items-center overflow-y-scroll">
       <div class="mb-8 w-[365px]">
+        <div class="flex gap-4 mb-4">
+          <div
+            v-for="day in availableDays"
+            :key="day"
+            @click="selectDay(day)"
+            :class="['cursor-pointer p-2 rounded', selectedDay === day ? 'bg-blue-500 text-white' : 'bg-gray-200']"
+          >
+            {{ day }}
+          </div>
+        </div>
+  
         <div class="flex flex-col">
           <div
             v-for="row in rows"
@@ -23,56 +34,16 @@
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-8 mb-6">
-        <div class="flex gap-2.5">
-          <div class="bg-color-5 rounded-full w-3 h-3 mt-1"></div>
-          <p class="poppinsSmall">Available</p>
-        </div>
-        <div class="flex gap-2.5">
-          <div class="bg-color-6 rounded-full w-3 h-3 mt-1"></div>
-          <p class="poppinsSmall">Reserved</p>
-        </div>
-        <div class="flex gap-2.5">
-          <div class="bg-color-2 rounded-full w-3 h-3 mt-1"></div>
-          <p class="poppinsSmall">Selected</p>
-        </div>
-      </div>
+  
       <div class="flex gap-4 mt-6 mb-12">
-        <div class="bg-color-2 w-14 h-[78px] rounded-md flex p-3 flex-col items-center gap-1">
-          <p class="text-color-3 font-bold">Fri</p>
-          <p class="poppins text-color-3 text-2xl font-bold">17</p>
-        </div>
-        <div class="bg-color-3 w-14 h-[78px] rounded-xl flex p-3 flex-col items-center gap-1">
-          <p class="poppinsDay">Sat</p>
-          <p class="poppins text-color-1 text-2xl font-bold">18</p>
-        </div>
-        <div class="bg-color-3 w-14 h-[78px] rounded-xl flex p-3 flex-col items-center gap-1">
-          <p class="poppinsDay">Sun</p>
-          <p class="poppins text-color-1 text-2xl font-bold">19</p>
-        </div>
-        <div class="bg-color-3 w-14 h-[78px] rounded-xl flex p-3 flex-col items-center gap-1">
-          <p class="poppinsDay">Mon</p>
-          <p class="poppins text-color-1 text-2xl font-bold">20</p>
-        </div>
-        <div class="bg-color-3 w-14 h-[78px] rounded-xl flex p-3 flex-col items-center gap-1">
-          <p class="poppinsDay">Tue</p>
-          <p class="poppins text-color-1 text-2xl font-bold">21</p>
+        <div v-for="(showing, index) in filteredShowings" :key="index" class="flex flex-col items-center">
+          <div @click="selectShowing(showing)" class="bg-color-2 w-[84px] h-[62px] rounded-md flex flex-col items-center p-1.5 cursor-pointer">
+            <p class="poppinsHour">{{ showing.time }}</p>
+            <p class="text-color-3 font-semi-bold text-xs">{{ showing.availableSeats.length }} seats</p>
+          </div>
         </div>
       </div>
-      <div class="flex gap-4 mt-6 mb-12">
-        <div class="bg-color-2 w-[84px] h-[62px] rounded-md flex flex-col items-center p-1.5">
-          <p class="poppinsHour">13:00</p>
-          <p class="text-color-3 font-semi-bold text-xs">$ 5.25 3D</p>
-        </div>
-        <div class="bg-color-3 w-[84px] h-[62px] rounded-md flex flex-col items-center p-1.5">
-          <p class="poppins text-color-1 text-xl font-bold">15:45</p>
-          <p class="poppinsDay">$ 5.99 XD</p>
-        </div>
-        <div class="bg-color-3 w-[84px] h-[62px] rounded-md flex flex-col items-center p-1.5">
-          <p class="poppins text-color-1 text-xl font-bold">18:50</p>
-          <p class="poppinsDay">$ 4.50 2D</p>
-        </div>
-      </div>
+  
       <div class="w-[333px] flex gap-12 mb-5">
         <div>
           <p class="text-lg text-color-3 inter">Price</p>
@@ -91,10 +62,21 @@
         availableSeats: [],
         selectedSeat: null,
         selectedSeatPrice: 0,
+        showings: [],
+        selectedShowing: null,
+        selectedDay: null, // Día seleccionado por defecto
+        availableDays: [], // Días disponibles
       };
     },
     created() {
-      this.fetchSeats();
+      this.fetchShowings();
+    },
+    computed: {
+      filteredShowings() {
+        // Filtrar las funciones según el día seleccionado
+        if (!this.selectedDay) return [];
+        return this.showings.filter(showing => showing.date === this.selectedDay);
+      },
     },
     methods: {
       getCookie(name) {
@@ -104,16 +86,12 @@
       },
   
       seatsPerRow(row) {
-        if (row === "A") {
-          return 5;
-        } else if (row === "B") {
-          return 7;
-        } else {
-          return 9;
-        }
+        if (row === "A") return 5;
+        else if (row === "B") return 7;
+        else return 9;
       },
   
-      async fetchSeats() {
+      async fetchShowings() {
         try {
           const token = this.getCookie("token");
           if (!token) {
@@ -121,26 +99,48 @@
             this.goToLogin();
             return;
           }
-          const response = await fetch(
-            "http://localhost:5000/showings/66d10ece4eb032980fd9468f/availability",
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+  
+          const response = await fetch("http://localhost:5000/showings/66d10e5a4eb032980fd9468b/availability", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
           const data = await response.json();
-          this.availableSeats = data.availableSeats; // Ajuste aquí para acceder a la propiedad correcta
+  
+          // Guardar funciones y días únicos
+          this.showings = data.map(showing => ({
+            time: showing.time,
+            availableSeats: showing.availableSeats,
+            date: showing.date,
+          }));
+  
+          // Obtener días únicos
+          const uniqueDays = new Set(this.showings.map(showing => showing.date));
+          this.availableDays = Array.from(uniqueDays);
+          this.selectedDay = this.availableDays[0]; // Seleccionar el primer día por defecto
         } catch (error) {
-          console.error("Error fetching seats:", error);
+          console.error("Error fetching showings:", error);
         }
+      },
+  
+      selectDay(day) {
+        this.selectedDay = day; // Guardamos el día seleccionado
+        this.selectedShowing = null; // Resetear la selección de horario
+        this.availableSeats = []; // Resetear los asientos disponibles
+      },
+  
+      selectShowing(showing) {
+        this.selectedShowing = showing; // Guardamos la función seleccionada
+        this.availableSeats = showing.availableSeats; // Actualizamos los asientos disponibles
+        this.selectedSeat = null; // Resetear el asiento seleccionado
+        this.selectedSeatPrice = 0; // Resetear el precio
       },
   
       isSeatAvailable(seatId) {
         const seat = this.availableSeats.find((s) => s.name === seatId);
-        return seat ? seat.available : false; // Ajuste para verificar la disponibilidad
+        return seat ? seat.available : false;
       },
   
       isSelected(seatId) {
@@ -152,12 +152,10 @@
           if (this.isSelected(seatId)) {
             this.selectedSeat = null;
             this.selectedSeatPrice = 0;
-            console.log(`Seat unselected: ${seatId}`);
           } else {
             this.selectedSeat = seatId;
             const seat = this.availableSeats.find((s) => s.name === seatId);
-            this.selectedSeatPrice = seat ? seat.price : 0; // Asignar el precio del asiento seleccionado
-            console.log(`Seat selected: ${seatId}`);
+            this.selectedSeatPrice = seat ? seat.price : 0;
           }
         } else {
           console.log(`Seat ${seatId} is unavailable`);
@@ -172,9 +170,9 @@
           return "bg-color-2 text-white";
         }
         if (isAvailable) {
-          return "bg-color-5 text-gray-300"; // Cambia para reflejar el estado de disponible
+          return "bg-color-5 text-gray-300";
         }
-        return "bg-color-6 text-gray-700"; // Cambia para reflejar el estado de reservado
+        return "bg-color-6 text-gray-700"; // Estado reservado
       },
   
       goToLogin() {
@@ -187,7 +185,7 @@
   <style>
   @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap");
   @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
-  @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100..900&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family/Poppins:wght@100..900&display=swap");
   
   .inter {
     font-family: "Inter", sans-serif;
