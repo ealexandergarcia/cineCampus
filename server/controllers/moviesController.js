@@ -12,7 +12,7 @@ const Showtime = require('../models/showingsModel'); // Modelo de horarios
  */
 const getMovies = async (req, res) => {
     try {
-        const today = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+        const today = new Date(); // Fecha actual como objeto Date
         const movies = await Movie.aggregate([
             {
                 $lookup: {
@@ -30,7 +30,7 @@ const getMovies = async (req, res) => {
             },
             {
                 $match: {
-                    'showings.date': { $gte: today }
+                    'showings.datetime': { $gte: today } // Filtramos usando datetime
                 }
             },
             {
@@ -39,12 +39,12 @@ const getMovies = async (req, res) => {
                     title: { $first: '$title' },
                     genre: { $first: '$genre' },
                     duration: { $first: '$duration' },
-                    poster:{ $first:'$poster'},
+                    poster: { $first: '$poster' },
                     showings: {
                         $push: {
                             _id: '$showings._id',
-                            date: '$showings.date',
-                            time: '$showings.time'
+                            date: { $dateToString: { format: "%Y-%m-%d", date: '$showings.datetime' } }, // Extraer fecha
+                            time: { $dateToString: { format: "%H:%M", date: '$showings.datetime' } } // Extraer hora
                         }
                     }
                 }
@@ -56,6 +56,7 @@ const getMovies = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving movies' });
     }
 };
+
 
 /**
  * Obtiene los detalles completos de una película específica según su id,
