@@ -92,12 +92,21 @@ export default {
       selectedShowing: null,
       selectedDay: null, // Día seleccionado por defecto
       availableDays: [], // Días disponibles
-      showingID: null
+      showingID: null,
+      selectedMovieId: null, // Agrega esta línea
     };
   },
   created() {
+  const selectedMovieId = sessionStorage.getItem('selectedMovieId');
+  if (selectedMovieId) {
+    this.selectedMovieId = selectedMovieId; // Asegúrate de definir esta variable en data()
     this.fetchShowings();
-  },
+  } else {
+    console.error("No selectedMovieId found in sessionStorage");
+    this.goToLogin();
+  }
+},
+
   computed: {
     filteredShowings() {
       if (!this.selectedDay) return [];
@@ -144,7 +153,7 @@ export default {
           return;
         }
 
-        const response = await fetch("http://localhost:5000/showings/66d10e5a4eb032980fd9468b/availability", {
+        const response = await fetch(`http://localhost:5000/showings/${this.selectedMovieId}/availability`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -202,7 +211,8 @@ export default {
 
       // Guardar el primer ID del array showingIds en selectedShowingId
       if (showing.showingId.length > 0) {
-        this.setCookie("selectedShowingId", showing.showingId[0], 1); // Guardar el primer ID en la cookie
+        // this.setCookie("selectedShowingId", showing.showingId[0], 1);
+        sessionStorage.setItem('selectedShowingId', showing.showingId[0], 1); // Guardar el primer ID en la cookie
       }
     },
 
@@ -242,7 +252,7 @@ export default {
       const selectedShowingId = this.getCookie("selectedShowingId");
 
       // Guardar la cookie de asientos seleccionados
-      this.setCookie("selectedSeats", selectedSeatsCookie, 1);
+      sessionStorage.setItem('selectedSeats', selectedSeatsCookie, 1); // Guardar el primer ID en la cookie
 
       alert("Tickets purchased!");
       // Puedes añadir la lógica para redirigir a otra página o realizar otra acción
