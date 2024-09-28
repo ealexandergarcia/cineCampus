@@ -5,35 +5,43 @@ import Login from '../views/Login.vue';
 import OpenningScreen from "../views/OpenningScreen.vue";
 import Cinema from "../views/Cinema.vue";
 import ChooseSeat from "../views/ChooseSeat.vue";
+
+// Definición de las rutas
 const routes = [
   { path: "/", component: OpenningScreen },
   { path: '/createAccount', component: CreateAccount },
   { path: '/login', component: Login },
   { path: '/home', component: Home },
-  { path: '/cinema', component:Cinema},
-  { path: '/ChooseSeat', component:ChooseSeat},
+  { path: '/cinema', component: Cinema },
+  { path: '/ChooseSeat', component: ChooseSeat },
 ];
 
+// Creación del router
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
 
+// Función para obtener la cookie
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
 // Guardia de navegación
 router.beforeEach((to, from, next) => {
-  const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
-    const [name, value] = cookie.split("=");
-    acc[name] = value;
-    return acc;
-  }, {});
+  const token = getCookie("token"); // Obtener el token
+  const protectedRoutes = ['/home', '/cinema', '/ChooseSeat'];
 
-  const cookieName = "token"; // Cambia esto por el nombre de tu cookie
-
-  // Si el usuario intenta acceder a '/login' y la cookie está presente, redirigir a '/home'
-  if (to.path === '/login' && cookies[cookieName]) {
-    next('/home'); // Redirige al home si ya está autenticado
+  // Verificar si el usuario tiene acceso a rutas protegidas
+  if (protectedRoutes.includes(to.path) && !token) {
+    console.error("No token found, redirecting to login");
+    next('/login'); // Redirigir al login
+  } else if (to.path === '/login' && token) {
+    next('/home'); // Redirigir al home si ya está autenticado
   } else {
-    next(); // Permite la navegación a la ruta solicitada
+    next(); // Permitir la navegación a la ruta solicitada
   }
 });
 
