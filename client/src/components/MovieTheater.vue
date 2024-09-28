@@ -23,6 +23,20 @@
         </div>
       </div>
     </div>
+    <div class="flex items-center gap-8 mb-6">
+      <div class="flex gap-2.5">
+        <div class="bg-color-5 rounded-full w-3 h-3 mt-1"></div>
+        <p class="font-medium text-sm text-white">Available</p>
+      </div>
+      <div class="flex gap-2.5">
+        <div class="bg-color-6 rounded-full w-3 h-3 mt-1"></div>
+        <p class="font-medium text-sm text-white">Reserved</p>
+      </div>
+      <div class="flex gap-2.5">
+        <div class="bg-color-2 rounded-full w-3 h-3 mt-1"></div>
+        <p class="font-medium text-sm text-white">Selected</p>
+      </div>
+    </div>
     <div class="flex gap-4 mb-4 w-4/5 overflow-auto">
       <div
         v-for="day in availableDays"
