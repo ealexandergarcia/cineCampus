@@ -70,7 +70,12 @@
         <p class="text-lg text-color-3 inter">Price</p>
         <p class="text-lg text-color-3 inter font-semibold">${{ totalPrice }}</p> <!-- Muestra el precio total -->
       </div>
-      <button class="bg-[#FE0000] h-14 w-full rounded-2xl text-white font-semibold text-base">Buy ticket</button>
+      <button 
+        class="bg-[#FE0000] h-14 w-full rounded-2xl text-white font-semibold text-base"
+        @click="buyTicket"
+      >
+        Buy ticket
+      </button>
     </div>
   </section>
 </template>
@@ -87,6 +92,7 @@ export default {
       selectedShowing: null,
       selectedDay: null, // Día seleccionado por defecto
       availableDays: [], // Días disponibles
+      showingID: null
     };
   },
   created() {
@@ -114,6 +120,13 @@ export default {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
       if (parts.length === 2) return parts.pop().split(";").shift();
+    },
+
+    setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+      const expires = "expires=" + d.toUTCString();
+      document.cookie = `${name}=${value}; ${expires}; path=/`;
     },
 
     seatsPerRow(row) {
@@ -146,7 +159,9 @@ export default {
           availableSeats: showing.availableSeats,
           date: showing.date,
           room: showing.room, // Asegúrate de incluir la sala aquí
+          showingId: showing.showingIds,
         }));
+        
 
         // Obtener días únicos
         const uniqueDays = new Set(this.showings.map(showing => showing.date));
@@ -182,6 +197,13 @@ export default {
       this.selectedShowing = showing;
       this.availableSeats = showing.availableSeats;
       this.selectedSeats = []; // Reiniciar selección de asientos
+
+      console.log(showing.showingId.length)
+
+      // Guardar el primer ID del array showingIds en selectedShowingId
+      if (showing.showingId.length > 0) {
+        this.setCookie("selectedShowingId", showing.showingId[0], 1); // Guardar el primer ID en la cookie
+      }
     },
 
     isSeatAvailable(seatId) {
@@ -208,16 +230,24 @@ export default {
     },
 
     seatClasses(seatId) {
-      const isAvailable = this.isSeatAvailable(seatId);
-      const isSelected = this.isSelected(seatId);
-      if (isSelected) {
-        return "bg-color-2 text-white"; // Clase para asiento seleccionado
-      }
-      if (isAvailable) {
-        return "bg-color-5 text-gray-300"; // Clase para asiento disponible
-      }
-      return "bg-color-6"; // Clase para asiento reservado
+      if (this.isSelected(seatId)) return 'bg-color-2 text-white'; // Color de asiento seleccionado
+      if (this.isSeatAvailable(seatId)) return 'bg-color-5'; // Color de asiento disponible
+      return 'bg-color-6'; // Color de asiento reservado
     },
+
+    buyTicket() {
+      const selectedSeatsCookie = JSON.stringify(this.selectedSeats);
+      
+      // No necesitamos obtener el ID de selectedShowing, ya que ya se ha guardado en la cookie
+      const selectedShowingId = this.getCookie("selectedShowingId");
+
+      // Guardar la cookie de asientos seleccionados
+      this.setCookie("selectedSeats", selectedSeatsCookie, 1);
+
+      alert("Tickets purchased!");
+      // Puedes añadir la lógica para redirigir a otra página o realizar otra acción
+    },
+
 
     formatDay(day) {
       const date = new Date(day);
@@ -226,14 +256,11 @@ export default {
         weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
       };
     },
-
+    
     goToLogin() {
-      window.location.href = "/login"; // Redirigir al login
+      // Implementa la lógica para redirigir a la página de login
+      this.$router.push('/login');
     },
   },
 };
 </script>
-
-<style scoped>
-/* Aquí puedes agregar estilos personalizados si es necesario */
-</style>
