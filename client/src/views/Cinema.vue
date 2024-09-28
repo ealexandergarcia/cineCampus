@@ -12,7 +12,7 @@
 
     <!-- Detalles de la película -->
     <div class="w-full">
-      <div class="w-full h-10 mt-2 px-8 flex justify-between">
+      <div class="w-full h-14 mt-2 px-8 flex justify-between">
         <div class="w-3/4">
           <p class="text-sm font-semibold text-left">{{ movie.title }}</p>
           <p class="text-xs font-medium text-left text-gray-400">{{ movie.genre.join(", ") }}</p>

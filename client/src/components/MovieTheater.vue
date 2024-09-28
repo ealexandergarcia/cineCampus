@@ -28,7 +28,7 @@
         v-for="day in availableDays"
         :key="day"
         @click="selectDay(day)"
-        :class="['cursor-pointer p-2 w-14 h-20 content-center', selectedDay === day ? 'bg-color-2 text-white rounded-md' : 'bg-gray-200 rounded-xl']"
+        :class="['cursor-pointer p-2 w-14 h-20 content-center', selectedDay === day ? 'bg-color-2 text-white rounded-md' : 'bg-[#F8F5F5] rounded-xl']"
       >
         <p :class="['text-sm ', selectedDay === day ? 'text-white font-bold' : 'text-[#969696] font-medium']">{{ formatDay(day).day }}</p>
         <p class="text-2xl font-bold">{{ formatDay(day).weekday }}</p>
@@ -36,18 +36,27 @@
     </div>
     <div class="flex gap-4 mt-6 mb-12 w-4/5 overflow-auto">
       <div v-for="(showing, index) in filteredShowings" :key="index" class="flex flex-col items-center">
-        <div @click="selectShowing(showing)" class="bg-color-2 w-[84px] h-[62px] rounded-md flex flex-col items-center p-1.5 cursor-pointer">
-          <p class="poppinsHour">{{ showing.time }}</p>
-          <p class="text-color-3 font-semi-bold text-xs">$ {{showing.room.price}}・{{ showing.room.name }}</p> <!-- Mostrar nombre de la sala -->
+        <div 
+          @click="selectShowing(showing)" 
+          :class="[
+            'w-[84px] h-[62px] rounded-md flex flex-col items-center p-1.5 cursor-pointer justify-center', 
+            selectedShowing && selectedShowing.time === showing.time ? 'bg-[#FE0000]' : 'bg-[#F8F5F5] '
+          ]"
+        >
+          <p :class="[
+            'text-2xl', selectedShowing && selectedShowing.time === showing.time ? 'text-white font-bold' : 'font-medium']">{{ showing.time }}</p>
+          <p :class="[
+            'text-sm', selectedShowing && selectedShowing.time === showing.time ? 'text-white font-bold' : 'font-medium text-[#969696] ']">$ {{ showing.room.price }}・{{ showing.room.name }}</p>
         </div>
       </div>
-    </div>
+  </div>
 
     <div class="w-[333px] flex gap-12 mb-5">
-      <div>
-        <p class="text-lg text-color-3 inter">Total Price</p>
-        <p class="text-lg text-color-3 inter font-semibold">{{ totalPrice }}</p> <!-- Muestra el precio total -->
+      <div class="text-left">
+        <p class="text-lg text-color-3 inter">Price</p>
+        <p class="text-lg text-color-3 inter font-semibold">${{ totalPrice }}</p> <!-- Muestra el precio total -->
       </div>
+      <button class="bg-[#FE0000] h-14 w-full rounded-2xl text-white font-semibold text-base">Buy ticket</button>
     </div>
   </section>
 </template>
