@@ -1,7 +1,7 @@
 <template>
   <div class="bg-[#121212] min-h-screen flex flex-col">
     <CinemaHeader title="Choose Seat" homeRoute="/cinema" />
-    <MovieTheater/>
+    <MovieTheater />
   </div>
 </template>
 
@@ -10,7 +10,18 @@ import CinemaHeader from '../components/CinemaHeader.vue'
 import MovieTheater from '../components/MovieTheater.vue'
 
 export default {
-  components: { CinemaHeader, MovieTheater }
+  components: { CinemaHeader, MovieTheater },
+  created() {
+    const selectedMovieId = sessionStorage.getItem('selectedMovieId');
+    if (!selectedMovieId) {
+      this.goToHome();
+    }
+  },
+  methods: {
+    goToHome() {
+      this.$router.push('/home');
+    }
+  }
 }
 </script>
 
