@@ -44,26 +44,26 @@
         @click="selectDay(day)"
         :class="['cursor-pointer p-2 w-14 h-20 content-center', selectedDay === day ? 'bg-color-2 text-white rounded-md' : 'bg-[#F8F5F5] rounded-xl']"
       >
-        <p :class="['text-sm ', selectedDay === day ? 'text-white font-bold' : 'text-[#969696] font-medium']">{{ formatDay(day).day }}</p>
-        <p class="text-2xl font-bold">{{ formatDay(day).weekday }}</p>
+        <p :class="['text-sm ', selectedDay === day ? 'text-white font-bold' : 'text-[#969696] font-medium']">{{ formatDay(day).weekday }}</p>
+        <p class="text-2xl font-bold">{{ formatDay(day).day }}</p>
       </div>
     </div>
     <div class="flex gap-4 mt-6 mb-12 w-4/5 overflow-auto">
       <div v-for="(showing, index) in filteredShowings" :key="index" class="flex flex-col items-center">
         <div 
           @click="selectShowing(showing)" 
-          :class="[
+          :class="[ 
             'w-[84px] h-[62px] rounded-md flex flex-col items-center p-1.5 cursor-pointer justify-center', 
-            selectedShowing && selectedShowing.time === showing.time ? 'bg-[#FE0000]' : 'bg-[#F8F5F5] '
+            selectedShowing && selectedShowing.time === showing.time ? 'bg-[#FE0000]' : 'bg-[#F8F5F5]'
           ]"
         >
-          <p :class="[
+          <p :class="[ 
             'text-2xl', selectedShowing && selectedShowing.time === showing.time ? 'text-white font-bold' : 'font-medium']">{{ showing.time }}</p>
-          <p :class="[
-            'text-sm', selectedShowing && selectedShowing.time === showing.time ? 'text-white font-bold' : 'font-medium text-[#969696] ']">$ {{ showing.room.price }}・{{ showing.room.name }}</p>
+          <p :class="[ 
+            'text-sm', selectedShowing && selectedShowing.time === showing.time ? 'text-white font-bold' : 'font-medium text-[#969696]']">$ {{ showing.room.price }}・{{ showing.room.name }}</p>
         </div>
       </div>
-  </div>
+    </div>
 
     <div class="w-[333px] flex gap-12 mb-5">
       <div class="text-left">
@@ -82,7 +82,7 @@ export default {
     return {
       rows: ["A", "B", "C", "D", "E", "F"],
       availableSeats: [],
-      selectedSeat: null,
+      selectedSeats: [], // Permite seleccionar múltiples asientos
       showings: [],
       selectedShowing: null,
       selectedDay: null, // Día seleccionado por defecto
@@ -98,11 +98,13 @@ export default {
       return this.showings.filter(showing => showing.date === this.selectedDay);
     },
     totalPrice() {
-      if (this.selectedShowing && this.selectedSeat) {
-        const seat = this.availableSeats.find(s => s.name === this.selectedSeat);
+      if (this.selectedShowing && this.selectedSeats.length > 0) {
         const roomPrice = this.selectedShowing.room.price; // Precio de la sala
-        const seatPrice = seat ? seat.price : 0; // Precio del asiento
-        return roomPrice + seatPrice; // Suma de precios
+        const selectedSeatsPrice = this.selectedSeats.reduce((total, seat) => {
+          const seatData = this.availableSeats.find(s => s.name === seat);
+          return total + (seatData ? seatData.price : 0); // Suma de precios de los asientos
+        }, 0);
+        return roomPrice + selectedSeatsPrice; // Suma de precios
       }
       return 0;
     },
@@ -167,12 +169,19 @@ export default {
       this.selectedDay = day; // Guardamos el día seleccionado
       this.selectedShowing = null; // Resetear la selección de horario
       this.availableSeats = []; // Resetear los asientos disponibles
+      this.selectedSeats = []; // Reiniciar selección de asientos
+
+      // Seleccionar automáticamente el primer horario
+      const firstShowing = this.filteredShowings[0];
+      if (firstShowing) {
+        this.selectShowing(firstShowing);
+      }
     },
 
     selectShowing(showing) {
       this.selectedShowing = showing;
       this.availableSeats = showing.availableSeats;
-      this.selectedSeat = null;
+      this.selectedSeats = []; // Reiniciar selección de asientos
     },
 
     isSeatAvailable(seatId) {
@@ -181,48 +190,50 @@ export default {
     },
 
     isSelected(seatId) {
-      return this.selectedSeat === seatId;
+      return this.selectedSeats.includes(seatId);
     },
 
     handleSeatClick(seatId) {
       if (this.isSeatAvailable(seatId)) {
         if (this.isSelected(seatId)) {
-          this.selectedSeat = null;
-          console.log(`Seat ${seatId} esta desseleccionado`);
-          
+          this.selectedSeats = this.selectedSeats.filter(s => s !== seatId);
+          console.log(`Seat ${seatId} está deseleccionado`);
         } else {
-          this.selectedSeat = seatId;
-          console.log(`Seat ${seatId} esta seleccionado`);
+          this.selectedSeats.push(seatId);
+          console.log(`Seat ${seatId} está seleccionado`);
         }
       } else {
-        console.log(`Seat ${seatId} is unavailable`);
+        console.log(`Seat ${seatId} no está disponible`);
       }
     },
 
     seatClasses(seatId) {
       const isAvailable = this.isSeatAvailable(seatId);
       const isSelected = this.isSelected(seatId);
-
       if (isSelected) {
-        return "bg-color-2 text-white";
+        return "bg-color-2 text-white"; // Clase para asiento seleccionado
       }
       if (isAvailable) {
-        return "bg-color-5 text-gray-300";
+        return "bg-color-5 text-gray-300"; // Clase para asiento disponible
       }
-      return "bg-color-6 text-gray-700"; // Estado reservado
+      return "bg-color-6"; // Clase para asiento reservado
+    },
+
+    formatDay(day) {
+      const date = new Date(day);
+      return {
+        day: date.toLocaleDateString('en-US', { day: 'numeric' }),
+        weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      };
     },
 
     goToLogin() {
-      this.$router.push("/login");
-    },
-
-    formatDay(dateString) {
-      const date = new Date(dateString);
-      const options = { weekday: "short", day: "numeric" };
-      const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
-      const [weekday, day] = formattedDate.split(" ");
-      return { weekday, day };
+      window.location.href = "/login"; // Redirigir al login
     },
   },
 };
 </script>
+
+<style scoped>
+/* Aquí puedes agregar estilos personalizados si es necesario */
+</style>
