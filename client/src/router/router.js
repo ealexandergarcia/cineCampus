@@ -40,6 +40,7 @@ router.beforeEach((to, from, next) => {
   if (protectedRoutes.includes(to.path) && !token) {
     console.error("No token found, redirecting to login");
     next('/login'); // Redirigir al login
+    sessionStorage.clear()
   } else if (to.path === '/login' && token) {
     next('/home'); // Redirigir al home si ya está autenticado
   } else {
