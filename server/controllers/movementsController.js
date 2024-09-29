@@ -3,6 +3,7 @@ const Payment = require('../models/paymentsModel');
 const Showing = require('../models/showingsModel');
 const Room = require('../models/roomsModel');
 const User = require('../models/usersModel');
+const { ObjectId } = require('mongodb');
 
 /**
  * Crea un nuevo movimiento que representa la compra de boletos por parte de un usuario.
@@ -215,4 +216,100 @@ const cancelReservation = async (req, res) => {
     }
 };
 
-module.exports = { createMovement, reserveSeats, cancelReservation };
+
+/**
+ * Obtiene un movimiento específico por ID, incluyendo datos relacionados (usuario, función, sala y pagos)
+ * usando agregaciones y `$lookup`.
+ *
+ * @param {Object} req - La solicitud HTTP.
+ *  - {String} req.params.movementId - El ID del movimiento a obtener.
+ * @param {Object} res - La respuesta HTTP.
+ * @returns {Promise<void>}
+ */
+const getMovementById = async (req, res) => {
+    try {
+        const { movementId } = req.params;
+
+        // Verifica si el ID del movimiento es válido
+        const movements = await Movement.findById(movementId);
+        if (!movements) {
+            return res.status(404).json({ message: 'ID de movimiento no válido' });
+        }
+
+        // Agregación con $lookup para buscar el movimiento y realizar los lookups a otras colecciones
+        const movement = await Movement.aggregate([
+            {
+                $match: { _id: new ObjectId(movementId) }
+            },
+            // Lookup para el usuario
+            {
+                $lookup: {
+                    from: 'users', // Nombre de la colección de usuarios
+                    localField: 'user',
+                    foreignField: '_id',
+                    as: 'userDetails'
+                }
+            },
+            {
+                $unwind: '$userDetails' // Para extraer el objeto del array de userDetails
+            },
+            // Lookup para la función (showing)
+            {
+                $lookup: {
+                    from: 'showings', // Nombre de la colección de funciones
+                    localField: 'showing',
+                    foreignField: '_id',
+                    as: 'showingDetails'
+                }
+            },
+            {
+                $unwind: '$showingDetails' // Para extraer el objeto del array de showingDetails
+            },
+            // Lookup para la sala (room) asociada a la función
+            {
+                $lookup: {
+                    from: 'rooms', // Nombre de la colección de salas
+                    localField: 'showingDetails.room',
+                    foreignField: '_id',
+                    as: 'roomDetails'
+                }
+            },
+            {
+                $unwind: '$roomDetails' // Para extraer el objeto del array de roomDetails
+            },
+            // Lookup para los pagos asociados al movimiento
+            {
+                $lookup: {
+                    from: 'payments', // Nombre de la colección de pagos
+                    localField: '_id',
+                    foreignField: 'movement',
+                    as: 'paymentDetails'
+                }
+            },
+            // Proyección de campos (opcional: seleccionar solo los campos que deseas)
+            {
+                $project: {
+                    user: '$userDetails',
+                    showing: '$showingDetails',
+                    room: '$roomDetails',
+                    seats: 1,
+                    status: 1,
+                    statusHistory: 1,
+                    paymentDetails: 1
+                }
+            }
+        ]);
+
+        // Verificar si se encontró el movimiento
+        if (!movement || movement.length === 0) {
+            return res.status(404).json({ message: 'Movimiento no encontrado' });
+        }
+
+        res.status(200).json({ movement: movement[0] });
+    } catch (error) {
+        console.error('Error al obtener el movimiento:', error);
+        res.status(500).json({ message: 'Error en el servidor' });
+    }
+};
+
+module.exports = {getMovementById, createMovement, reserveSeats, cancelReservation };
