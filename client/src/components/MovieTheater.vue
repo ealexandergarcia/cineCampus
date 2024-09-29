@@ -275,7 +275,7 @@ export default {
 
           alert("Tickets purchased!");
           // Redirigir a la página de órdenes
-          // this.$router.push('/Order');
+          this.$router.push('/Order');
         } else {
           const errorData = await response.json();
           alert(`Error purchasing tickets: ${errorData.message}`);
