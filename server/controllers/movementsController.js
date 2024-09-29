@@ -1,7 +1,6 @@
 const Movement = require('../models/movementsModel');
 const Payment = require('../models/paymentsModel');
 const Showing = require('../models/showingsModel');
-const Card = require('../models/cardsModel');
 const Room = require('../models/roomsModel');
 const User = require('../models/usersModel');
 
@@ -21,14 +20,14 @@ const User = require('../models/usersModel');
  * @throws {Object} 404 - Si no se encuentra la función especificada.
  * @throws {Object} 400 - Si alguno de los asientos solicitados no está disponible.
  * @throws {Object} 500 - Si ocurre un error en el servidor.
-*/
+ */
 const createMovement = async (req, res) => {
     try {
         const { showingId, seats, paymentMethod } = req.body;
 
         const showing = await Showing.findById(showingId);
         const room = await Room.findById(showing.room);
-        const user = await User.findById(req.user._id).populate('card'); // Asegúrate de incluir el campo card
+        const user = await User.findById(req.user._id).populate('card');
 
         if (!showing) {
             return res.status(404).json({ message: 'Función no encontrada' });
@@ -48,6 +47,20 @@ const createMovement = async (req, res) => {
             });
         }
 
+        // Crea el movimiento inicialmente
+        const newMovement = new Movement({
+            user: req.user._id,
+            showing: showingId,
+            seats: seats,
+            status: 'pending',
+            statusHistory: [{
+                status: 'pending',
+                date: new Date()
+            }]
+        });
+
+        await newMovement.save(); // Guardar movimiento antes de cambiar estado de asientos
+
         // Calcula el monto total y actualiza el estado de los asientos a no disponibles
         let totalAmount = 0;
         showing.availableSeats.forEach(seat => {
@@ -57,7 +70,7 @@ const createMovement = async (req, res) => {
             }
         });
 
-        await showing.save();
+        await showing.save(); // Guardar cambios en los asientos
 
         // Verifica si el usuario tiene una tarjeta VIP válida
         const card = user.card;
@@ -71,19 +84,9 @@ const createMovement = async (req, res) => {
             finalAmount -= finalAmount * discount / 100;
         }
 
-        // Crea el movimiento
-        const newMovement = new Movement({
-            user: req.user._id,
-            showing: showingId,
-            seats: seats
-        });
-
-        await newMovement.save();
-
         // Crea el pago
         const newPayment = new Payment({
             movement: newMovement._id,
-            paymentMethod: paymentMethod || 'credit_card',
             amount: finalAmount,
             discount: discount,
             status: 'pending'
@@ -102,10 +105,6 @@ const createMovement = async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor' });
     }
 };
-
-
-
-
 
 
 /**
@@ -146,7 +145,11 @@ const reserveSeats = async (req, res) => {
             user: req.user._id,
             showing: showingId,
             seats: seats,
-            status: 'reserved'
+            status: 'reserved',
+            statusHistory: [{
+                type: 'reserved',
+                date: new Date()
+            }]
         });
 
         await newMovement.save();
@@ -197,8 +200,12 @@ const cancelReservation = async (req, res) => {
 
         await showing.save();
 
-        // Cambiar el estado de la reserva a 'cancelled'
+        // Cambiar el estado de la reserva a 'cancelled' y actualizar el statusHistory
         reservation.status = 'cancelled';
+        reservation.statusHistory.push({
+            type: 'cancelled',
+            date: new Date()
+        });
         await reservation.save();
 
         res.status(200).json({ message: 'Reserva cancelada con éxito', reservation });
@@ -207,4 +214,5 @@ const cancelReservation = async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor' });
     }
 };
-module.exports = { createMovement, reserveSeats, cancelReservation  };
+
+module.exports = { createMovement, reserveSeats, cancelReservation };
