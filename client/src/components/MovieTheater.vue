@@ -97,15 +97,15 @@ export default {
     };
   },
   created() {
-  const selectedMovieId = sessionStorage.getItem('selectedMovieId');
-  if (selectedMovieId) {
-    this.selectedMovieId = selectedMovieId; // Asegúrate de definir esta variable en data()
-    this.fetchShowings();
-  } else {
-    console.error("No selectedMovieId found in sessionStorage");
-    this.goToLogin();
-  }
-},
+    const selectedMovieId = sessionStorage.getItem('selectedMovieId');
+    if (selectedMovieId) {
+      this.selectedMovieId = selectedMovieId; // Asegúrate de definir esta variable en data()
+      this.fetchShowings();
+    } else {
+      console.error("No selectedMovieId found in sessionStorage");
+      this.goToLogin();
+    }
+  },
 
   computed: {
     filteredShowings() {
@@ -170,7 +170,6 @@ export default {
           room: showing.room, // Asegúrate de incluir la sala aquí
           showingId: showing.showingIds,
         }));
-        
 
         // Obtener días únicos
         const uniqueDays = new Set(this.showings.map(showing => showing.date));
@@ -234,6 +233,8 @@ export default {
           this.selectedSeats.push(seatId);
           console.log(`Seat ${seatId} está seleccionado`);
         }
+        // Guarda el array de asientos seleccionados en sessionStorage como JSON
+        sessionStorage.setItem("selectedSeats", JSON.stringify(this.selectedSeats));
       } else {
         console.log(`Seat ${seatId} no está disponible`);
       }
@@ -245,17 +246,42 @@ export default {
       return 'bg-color-6'; // Color de asiento reservado
     },
 
-    buyTicket() {
-      const selectedSeatsCookie = JSON.stringify(this.selectedSeats);
-      
-      // No necesitamos obtener el ID de selectedShowing, ya que ya se ha guardado en la cookie
-      const selectedShowingId = this.getCookie("selectedShowingId");
+    async buyTicket() {
+    const selectedSeatsS = JSON.parse(sessionStorage.getItem("selectedSeats")); // Convierte el string de JSON a un array
+    const selectedShowingId = sessionStorage.getItem("selectedShowingId");
+    console.log(selectedSeatsS, selectedShowingId);
+    
+    // Datos para la petición POST
+    const data = {
+        showingId: selectedShowingId,
+        seats: selectedSeatsS // Envía el array de asientos seleccionados
+    };
 
-      // Guardar la cookie de asientos seleccionados
-      sessionStorage.setItem('selectedSeats', selectedSeatsCookie, 1); // Guardar el primer ID en la cookie
+    try {
+        const token = this.getCookie("token");
+        console.log(token);
+        
+        const response = await fetch(`http://localhost:5000/movements/v1/purchase`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
 
-      alert("Tickets purchased!");
-      // Puedes añadir la lógica para redirigir a otra página o realizar otra acción
+        if (response.ok) {
+            alert("Tickets purchased!");
+            // Redirigir a la página de órdenes
+            this.$router.push('/Order');
+        } else {
+            const errorData = await response.json();
+            alert(`Error purchasing tickets: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error("Error purchasing tickets:", error);
+        alert("Error purchasing tickets. Please try again later.");
+    }
     },
 
 
