@@ -269,9 +269,9 @@ export default {
           const responseData = await response.json();
           // Obtén la respuesta del servidor
           const movementId = responseData.movement._id; // Asegúrate de que el servidor devuelva el ID del movimiento
-          console.log(responseData.movement);
-          console.log(movementId);
+          const paymentId = responseData.payment._id; // Asegúrate de que el servidor devuelva el ID del movimiento
           sessionStorage.setItem('movementId', movementId); // Guarda el ID en sessionStorage
+          sessionStorage.setItem('paymentId', paymentId); // Guarda el ID en sessionStorage
 
           alert("Tickets purchased!");
           // Redirigir a la página de órdenes
