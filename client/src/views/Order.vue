@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-screen bg-gray-900 text-white">
+  <div class="flex flex-col  bg-gray-900 text-white">
     <div class="bg-[linear-gradient(-128deg,_rgba(39,39,39,0)_0%,_rgba(39,39,39,1)_100%)]">
       <!-- Header -->
       <CinemaHeader title="Order Summary" homeRoute="/ChooseSeat" />
@@ -22,7 +22,6 @@
         ORDER NUMBER: <span class="text-white">{{ orderId }}</span>
       </p>
       <p class="text-[13px] text-gray-400">
-        
       </p>
     </div>
 
@@ -41,15 +40,33 @@
       </div>
     </div>
 
-    <!-- Payment Method -->
-    <div class="p-4">
-      <h3 class="text-lg mb-2">Payment method</h3>
-      <div class="flex items-center justify-between bg-gray-900 p-3 rounded-lg">
-        <div class="flex items-center">
-          <img src="../assets/img/palomitas.png" alt="MasterCard" class="w-10 h-6 object-contain mr-3" />
-          <span>**** **** **** 7865</span>
+    <!-- Payment Methods Accordion -->
+    <div class="p-4 pt-6">
+      <h3 class="text-lg mb-2">Payment Method</h3>
+      <div v-for="method in paymentMethods" :key="method.type">
+        <button @click="toggleMethod(method.type)" class="w-full text-left bg-[#272727] p-3 rounded-lg mb-2 flex justify-between border border-[#fff3]">
+          <span>{{ method.label }}</span>
+          <span>{{ method.selected ? '-' : '+' }}</span>
+        </button>
+        <div v-if="method.selected" class="p-3 bg-gray-900 rounded-lg">
+          <form @submit.prevent="savePaymentMethod(method.type)">
+            <div v-if="method.type === 'credit_card'">
+              <label class="block text-gray-400">Card Number</label>
+              <input type="text" class="w-full p-2 bg-[#272727] rounded mb-2" placeholder="XXXX XXXX XXXX XXXX" />
+            </div>
+            <div v-if="method.type === 'debit_card'">
+              <label class="block text-gray-400">Card Number</label>
+              <input type="text" class="w-full p-2 bg-[#272727] rounded mb-2" placeholder="XXXX XXXX XXXX XXXX" />
+            </div>
+            <div v-if="method.type === 'paypal'">
+              <label class="block text-gray-400">Email</label>
+              <input type="email" class="w-full p-2 bg-[#272727] rounded mb-2" placeholder="your-email@example.com" />
+            </div>
+            <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg">
+              Save Payment Method
+            </button>
+          </form>
         </div>
-        <div class="w-4 h-4 bg-red-600 rounded-full"></div>
       </div>
     </div>
 
@@ -87,6 +104,11 @@ export default {
       selectedSeats: [],
       groupedSeats: [],
       timeLeft: 300,
+      paymentMethods: [
+        { type: 'credit_card', label: 'Credit Card', selected: false },
+        { type: 'debit_card', label: 'Debit Card', selected: false },
+        { type: 'paypal', label: 'PayPal', selected: false },
+      ],
     };
   },
   computed: {
@@ -115,19 +137,30 @@ export default {
     },
     ticketQuantity() {
       const count = this.selectedSeats.length;
-      const seatNames = this.selectedSeats.join(', ');
       return `${count} TICKET${count !== 1 ? 'S' : ''}`;
     },
     ticketDetailsSeatNames() {
-      const seatNames = this.selectedSeats.join(', ');
-      return `${seatNames}`;
+      return this.selectedSeats.join(', ');
     },
   },
   methods: {
+    toggleMethod(methodType) {
+      this.paymentMethods.forEach(method => {
+        if (method.type === methodType) {
+          method.selected = !method.selected;
+        } else {
+          method.selected = false; // Cerrar otros métodos
+        }
+      });
+    },
+    savePaymentMethod(methodType) {
+      console.log(`Selected payment method: ${methodType}`);
+      // Aquí puedes guardar el método de pago si lo necesitas
+    },
     getCookie(name) {
       const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(";").shift();
+      const parts = value.split(`; ${name}=`); 
+      if (parts.length === 2) return parts.pop().split(";").shift(); 
     },
     async fetchMovementDetails() {
       try {
@@ -151,9 +184,8 @@ export default {
         // Obtener el movieId y realizar la solicitud de detalles de la película
         const movieId = movement.showing.movie;
         await this.fetchMovieDetails(movieId);
-
+        
         // Obtener el tiempo y la agrupación de los asientos
-        this.showingTime = movement.showing.datetime;
         this.groupSeats(movement.showing.availableSeats);
       } catch (error) {
         console.error('Error fetching movement details:', error);

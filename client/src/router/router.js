@@ -34,7 +34,7 @@ function getCookie(name) {
 // Guardia de navegación
 router.beforeEach((to, from, next) => {
   const token = getCookie("token"); // Obtener el token
-  const protectedRoutes = ['/home', '/cinema', '/ChooseSeat','Order'];
+  const protectedRoutes = ['/home', '/cinema', '/ChooseSeat','/Order'];
 
   // Verificar si el usuario tiene acceso a rutas protegidas
   if (protectedRoutes.includes(to.path) && !token) {
