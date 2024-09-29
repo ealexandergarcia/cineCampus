@@ -247,42 +247,45 @@ export default {
     },
 
     async buyTicket() {
-    const selectedSeatsS = JSON.parse(sessionStorage.getItem("selectedSeats")); // Convierte el string de JSON a un array
-    const selectedShowingId = sessionStorage.getItem("selectedShowingId");
-    console.log(selectedSeatsS, selectedShowingId);
-    
-    // Datos para la petición POST
-    const data = {
+      const selectedSeatsS = sessionStorage.getItem("selectedSeats");
+      const selectedShowingId = sessionStorage.getItem("selectedShowingId");
+      const data = {
         showingId: selectedShowingId,
-        seats: selectedSeatsS // Envía el array de asientos seleccionados
-    };
+        seats: selectedSeatsS
+      };
 
-    try {
+      try {
         const token = this.getCookie("token");
-        console.log(token);
-        
         const response = await fetch(`http://localhost:5000/movements/v1/purchase`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(data),
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
         });
 
         if (response.ok) {
-            alert("Tickets purchased!");
-            // Redirigir a la página de órdenes
-            this.$router.push('/Order');
+          const responseData = await response.json();
+          // Obtén la respuesta del servidor
+          const movementId = responseData.movement._id; // Asegúrate de que el servidor devuelva el ID del movimiento
+          console.log(responseData.movement);
+          console.log(movementId);
+          sessionStorage.setItem('movementId', movementId); // Guarda el ID en sessionStorage
+
+          alert("Tickets purchased!");
+          // Redirigir a la página de órdenes
+          // this.$router.push('/Order');
         } else {
-            const errorData = await response.json();
-            alert(`Error purchasing tickets: ${errorData.message}`);
+          const errorData = await response.json();
+          alert(`Error purchasing tickets: ${errorData.message}`);
         }
-    } catch (error) {
+      } catch (error) {
         console.error("Error purchasing tickets:", error);
         alert("Error purchasing tickets. Please try again later.");
-    }
+      }
     },
+
 
 
     formatDay(day) {
