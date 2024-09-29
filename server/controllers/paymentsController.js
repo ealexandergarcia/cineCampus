@@ -195,59 +195,72 @@ const initiateReservationPayment = async (req, res) => {
 const updatePaymentStatus = async (req, res) => {
     try {
         const { paymentId } = req.params;
-        const { status } = req.body;
+        console.log(paymentId);
+        
+        const { status, paymentMethod } = req.body;
 
-        const payment = await Payment.findById(paymentId).populate('movement');
+        const payment = await Payment.findById(paymentId);
+        console.log(payment);
+        
         if (!payment) {
             return res.status(404).json({ message: 'Payment not found' });
         }
 
-        if (payment.status === status) {
-            return res.status(400).json({ message: 'Payment status already updated' });
-        }
-
         let newMovementStatus;
 
-        if (status === 'accepted') {
-            newMovementStatus = 'purchased';
-        } else if (status === 'rejected' || status === 'cancelled') {
-            newMovementStatus = 'cancelled';
-
-            const showing = await Showing.findById(payment.movement.showing);
-            if (!showing) {
-                return res.status(404).json({ message: 'Showing not found' });
-            }
-
-            showing.availableSeats.forEach(seat => {
-                if (payment.movement.seats.includes(seat.name)) {
-                    seat.available = true;
-                }
-            });
-
-            await showing.save();
-        } else {
-            return res.status(400).json({ message: 'Invalid status' });
+        if (paymentMethod) {
+            // Si se proporciona el método de pago, se actualiza el estado a 'processing'
+            payment.status = status;
+            payment.paymentMethod = paymentMethod;
+            newMovementStatus = 'processing';
+            await payment.save();
         }
 
-        payment.status = status;
-        await payment.save();
+        // Actualizar el movimiento relacionado
+        const movement = await Movement.findById(payment.movement);
+        console.log(movement);
+        
+        if (!movement) {
+            return res.status(404).json({ message: 'Movement not found' });
+        }
 
-        const newMovement = new Movement({
-            user: payment.movement.user,
-            showing: payment.movement.showing,
-            seats: payment.movement.seats,
-            date: payment.movement.date,
-            status: newMovementStatus
+        // Actualiza el estado del movimiento
+        movement.status = newMovementStatus; 
+
+        // Agregar nuevo estado a la historia
+        movement.statusHistory.push({
+            status: newMovementStatus,
+            date: new Date(), // o puedes usar una fecha específica si lo prefieres
         });
 
-        await newMovement.save();
+        await movement.save(); // Guarda el movimiento actualizado
+        // if (status === 'accepted') {
+        //     newMovementStatus = 'purchased';
+        // } else if (status === 'rejected' || status === 'cancelled') {
+        //     newMovementStatus = 'cancelled';
 
-        res.status(200).json({ message: 'Payment updated and new movement created', payment, newMovement });
+        //     const showing = await Showing.findById(payment.movement.showing);
+        //     if (!showing) {
+        //         return res.status(404).json({ message: 'Showing not found' });
+        //     }
+
+        //     showing.availableSeats.forEach(seat => {
+        //         if (payment.movement.seats.includes(seat.name)) {
+        //             seat.available = true;
+        //         }
+        //     });
+
+        //     await showing.save();
+        // } else {
+        //     return res.status(400).json({ message: 'Invalid status' });
+        // }
+        res.status(200).json({ message: 'Payment updated and movement status changed', payment, movement });
     } catch (error) {
         console.error('Error updating payment status:', error);
         res.status(500).json({ message: 'Error updating payment status', error: error.message });
     }
 };
+
 
 module.exports = {
     initiateReservationPayment,
