@@ -17,9 +17,22 @@ const movementSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'purchased', 'cancelled','rejected','reserved'],
+        enum: ['pending', 'processing', 'purchased', 'cancelled', 'rejected', 'reserved'],
         default: 'pending'
-    }
+    },
+    statusHistory: [
+        {
+            status: {
+                type: String,
+                enum: ['pending', 'processing', 'purchased', 'cancelled', 'rejected', 'reserved'],
+                required: true
+            },
+            date: {
+                type: Date,
+                default: Date.now // Guarda la fecha actual por defecto
+            }
+        }
+    ]
 }, { timestamps: true });
 
 const Movement = mongoose.model('Movement', movementSchema);
