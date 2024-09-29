@@ -80,7 +80,7 @@
 
     <!-- Buy Button -->
     <div class="mt-auto p-4">
-      <button class="w-full bg-red-600 text-white py-3 rounded-lg text-lg font-semibold">
+      <button @click="buyTicket" class="w-full bg-red-600 text-white py-3 rounded-lg text-lg font-semibold">
         Buy ticket
       </button>
     </div>
@@ -237,6 +237,42 @@ export default {
       });
 
       this.groupedSeats = Object.values(seatGroups);
+    },
+    async buyTicket() {
+      const paymentId = sessionStorage.getItem('paymentId');
+      const paymentMethod = this.paymentMethods.find(method => method.selected)?.type;
+
+      if (!paymentId || !paymentMethod) {
+        alert('Por favor, guarda un método de pago antes de continuar.');
+        return;
+      }
+
+      const body = {
+        status: "processing",
+        paymentMethod: paymentMethod, // 'credit_card', 'debit_card', or 'paypal'
+      };
+      console.log(body);
+      
+      try {
+        const response = await fetch(`http://localhost:5000/payments/${paymentId}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al procesar el pago');
+        }
+
+        const result = await response.json();
+        alert('Pago procesado con éxito: ' + result.message);
+        // Redirige o realiza otra acción después del pago exitoso.
+      } catch (error) {
+        console.error('Error en la compra:', error);
+        alert('Error en la compra: ' + error.message);
+      }
     },
   },
   mounted() {
