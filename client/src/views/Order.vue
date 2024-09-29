@@ -4,7 +4,7 @@
         <div class="bg-[linear-gradient(-128deg,_rgba(39,39,39,0)_0%,_rgba(39,39,39,1)_100%)]">
             <!-- Your content here -->
             <!-- Header -->
-            <CinemaHeader title="Choose Seat" homeRoute="/cinema" />
+            <CinemaHeader title="Order Summary" homeRoute="/ChooseSeat" />
         
             <!-- Movie Info -->
             <div class="flex p-4" v-if="movie">
