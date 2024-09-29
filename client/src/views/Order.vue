@@ -165,6 +165,10 @@ export default {
     async fetchMovementDetails() {
       try {
         const movementId = sessionStorage.getItem('movementId');
+        if (!movementId) {
+          // El movimiento no se encontró, redirigir al login y borrar el movementId
+          this.$router.push('/login'); // Cambia '/login' por la ruta de tu login
+       }
         const token = this.getCookie("token");
         const response = await fetch(`http://localhost:5000/movements/v1/${movementId}`, {
           method: "GET",
@@ -173,6 +177,15 @@ export default {
             Authorization: `Bearer ${token}`,
           },
         });
+        if (!response.ok) {
+          if (response.status === 404) {
+            // El movimiento no se encontró, redirigir al login y borrar el movementId
+            sessionStorage.removeItem('movementId');
+            this.$router.push('/login'); // Cambia '/login' por la ruta de tu login
+            return;
+          }
+          throw new Error('Error fetching movement details');
+        }
         const data = await response.json();
         const movement = data.movement;
 
@@ -181,6 +194,7 @@ export default {
         this.roomPrice = movement.room.price;
         this.selectedSeats = movement.seats ? JSON.parse(movement.seats[0]) : [];
         this.showingTime = movement.showing.datetime;
+        
         // Obtener el movieId y realizar la solicitud de detalles de la película
         const movieId = movement.showing.movie;
         await this.fetchMovieDetails(movieId);
