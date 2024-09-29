@@ -20,6 +20,8 @@ export default {
   mounted() {
     // Eliminar el ID del sessionStorage al cargar el componente
     sessionStorage.removeItem('selectedMovieId');
+    sessionStorage.removeItem('selectedSeats');
+    sessionStorage.removeItem('selectedShowingId');
   }
 }
 </script>
