@@ -3,7 +3,9 @@ const Movement = require('../models/movementsModel');
 const Showing = require('../models/showingsModel');
 const Card = require('../models/cardsModel');
 const Room = require('../models/roomsModel');
+const mongoose = require('mongoose'); 
 const User = require('../models/usersModel');
+const { ObjectId } = require('mongodb');
 
 
 /**
@@ -266,9 +268,88 @@ const updatePaymentStatus = async (req, res) => {
     }
 };
 
+const getPaymentDetails = async (req, res) => {
+    try {
+      const { paymentId } = req.params;
+      
+      // Verificar si el paymentId es un ObjectId válido
+      if (!mongoose.Types.ObjectId.isValid(paymentId)) {
+        return res.status(400).json({ message: 'Invalid payment ID' });
+      }
+      
+      console.log('paymentId recibido:', paymentId);
+      
+      const paymentDetails = await Payment.aggregate([
+        { $match: { _id: new ObjectId(paymentId) } }, // Convertir el paymentId a ObjectId
+        {
+          $lookup: {
+            from: 'movements',
+            localField: 'movement',
+            foreignField: '_id',
+            as: 'movementDetails'
+          }
+        },
+        { $unwind: { path: '$movementDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'showings',
+            localField: 'movementDetails.showing',
+            foreignField: '_id',
+            as: 'showingDetails'
+          }
+        },
+        { $unwind: { path: '$showingDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'movies',
+            localField: 'showingDetails.movie',
+            foreignField: '_id',
+            as: 'movieDetails'
+          }
+        },
+        { $unwind: { path: '$movieDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'rooms',
+            localField: 'showingDetails.room',
+            foreignField: '_id',
+            as: 'roomDetails'
+          }
+        },
+        { $unwind: { path: '$roomDetails', preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            _id: 1,
+            amount: 1,
+            paymentMethod: 1,
+            status: 1,
+            movement: '$movementDetails._id',
+            user: '$movementDetails.user',
+            seats: '$movementDetails.seats',
+            movie: '$movieDetails.title',
+            poster: '$movieDetails.poster',
+            room: '$roomDetails.name',
+            showingTime: '$showingDetails.datetime',
+          }
+        }
+      ]);
+  
+      console.log('paymentDetails:', paymentDetails);
+  
+      if (!paymentDetails || paymentDetails.length === 0) {
+        return res.status(404).json({ message: 'Payment not found' });
+      }
+  
+      res.status(200).json({ message: 'Payment details retrieved', payment: paymentDetails[0] });
+    } catch (error) {
+      console.error('Error fetching payment details:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
 
 
 module.exports = {
     initiateReservationPayment,
-    updatePaymentStatus
+    updatePaymentStatus,
+    getPaymentDetails   
 };

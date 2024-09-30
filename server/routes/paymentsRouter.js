@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { updatePaymentStatus, initiateReservationPayment } = require('../controllers/paymentsController');
+const { updatePaymentStatus, initiateReservationPayment, getPaymentDetails } = require('../controllers/paymentsController');
 const authenticate = require('../middleware/authMiddleware');
 
 /**
@@ -25,5 +25,14 @@ router.post('/v1/initiate/:reservationId', authenticate, initiateReservationPaym
  * @returns {Object} - A JSON object containing a success message and the updated payment details.
  */
 router.put('/:paymentId/status', authenticate, updatePaymentStatus);
+
+
+/**
+ * @route GET /:paymentId/details
+ * @description Fetches the details of a payment, including movement, showing, movie, and room information.
+ * @param {String} req.params.paymentId - The ID of the payment to retrieve details for.
+ * @returns {Object} - A JSON object containing the payment details if found, or an error message if not.
+ */
+router.get('/:paymentId/details', authenticate, getPaymentDetails);
 
 module.exports = router;
