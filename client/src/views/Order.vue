@@ -254,10 +254,12 @@ export default {
       console.log(body);
       
       try {
+        const token = this.getCookie("token");
         const response = await fetch(`http://localhost:5000/payments/${paymentId}/status`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(body),
         });
@@ -268,6 +270,7 @@ export default {
 
         const result = await response.json();
         alert('Pago procesado con éxito: ' + result.message);
+        this.$router.push('/Loading');
         // Redirige o realiza otra acción después del pago exitoso.
       } catch (error) {
         console.error('Error en la compra:', error);
