@@ -8,7 +8,7 @@
             <div class="relative h-40 bg-gray-300 p-15 rounded-xl">
                 <img :src="payment.poster" alt="Movie Poster" class="w-full h-full object-cover rounded-xl" />
             </div>
-  
+
             <!-- Ticket Details -->
             <div class="p-4 text-black text-left">
                 <h2 class="text-xl font-bold mb-1">{{ payment.movie }}</h2>
@@ -21,7 +21,7 @@
                     </div>
                     <img src="../assets/img/palomitas.png" alt="Cinema Logo" class="w-10 h-10 rounded" />
                 </div>
-  
+
                 <div class="grid grid-cols-3 mb-4">
                     <div class="col-span-2 mb-6"> <!-- Ocupa 2/3 del espacio -->
                         <h3 class="font-bold text-[13px] text-[#787878]">Date</h3>
@@ -44,17 +44,15 @@
                         <p class="text-base font-bold">${{ payment.amount }}</p>
                     </div>
                     <div class="mb-6"> <!-- Ocupa 1/3 del espacio -->
-                        <h3 class="font-bold text-[13px] text-[#787878]">Order ID</h3>
+                        <h3 class="font-bold text-[13px] text-[#787878] ">Order ID</h3>
                         <p class="text-base font-bold whitespace-nowrap overflow-hidden text-ellipsis">{{ payment._id }}</p>
                     </div>
                 </div>
-  
-                <div class="border-t border-dashed border-gray-300 pt-4">
-                    <div class="w-full h-20 bg-gray-200">
-                        <!-- Placeholder for barcode -->
-                        <div class="w-full h-full flex items-center justify-center text-gray-400">
-                            Barcode Placeholder
-                        </div>
+
+                <div class="border-t border-dashed border-gray-300 pt-4 flex justify-center">
+                    <div class="barcode-container w-full">
+                        <!-- Contenedor para el código de barras -->
+                        <svg id="barcode"></svg>
                     </div>
                 </div>
             </div>
@@ -66,8 +64,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import CinemaHeader from '../components/CinemaHeader.vue';
+import JsBarcode from 'jsbarcode';
 
 const payment = ref(null);
 const formattedDate = ref('');
@@ -103,16 +102,32 @@ const fetchPaymentDetails = async () => {
         
         if (response.ok) {
             payment.value = data.payment;
-            formattedDate.value = formatDate(payment.value.showingTime); // Actualizar formato de fecha
+            formattedDate.value = formatDate(payment.value.showingTime); 
             formattedTime.value = new Date(payment.value.showingTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            seatNames.value = payment.value.seats.join(', '); // Si los asientos están en formato de arreglo
+            seatNames.value = payment.value.seats.join(', '); 
+            
+            // Esperar a que el DOM se actualice
+            await nextTick();
+            generateBarcode(payment.value._id); // Generar código de barras
         } else {
-            error.value = data.message; // Guardar el mensaje de error
+            error.value = data.message; 
             console.error(data.message);
         }
     } catch (error) {
         console.error('Error fetching payment details:', error);
     }
+};
+
+const generateBarcode = (orderId) => {
+    JsBarcode("#barcode", orderId, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 1, // Reduce el ancho del código de barras
+        height: 30, // Reduce la altura del código de barras
+        displayValue: true,
+        fontSize: 12, // Ajusta el tamaño de la fuente
+        margin: 2 // Margen alrededor del código de barras
+    });
 };
 
 const getCookie = (name) => {
@@ -127,5 +142,12 @@ onMounted(fetchPaymentDetails);
 <style scoped>
 .bg-black {
     background-color: #121212;
+}
+
+.barcode-container {
+    width: 100%; /* Hace que el contenedor ocupe todo el ancho disponible */
+    max-width: 300px; /* Ajusta el tamaño máximo si es necesario */
+    margin: 0 auto; /* Centra el contenedor */
+    text-align: center; /* Centra el contenido */
 }
 </style>
