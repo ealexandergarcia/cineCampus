@@ -1,13 +1,13 @@
 # CineCampus API
 
 ## env
-MONGO_PROTOCOLO=mongodb://
-MONGO_USER=root
-MONGO_PSW=campus2023
-MONGO_HOST=localhost
-MONGO_PORT=27017
-MONGO_DB_NAME=cineCampus
-MONGO_AUTH=authSource=admin
+MONGO_PROTOCOLO=mongodb:// 
+MONGO_USER=root 
+MONGO_PSW=campus2023 
+MONGO_HOST=10.0.0.128 
+MONGO_PORT=27017 
+MONGO_DB_NAME=cineCampus 
+MONGO_AUTH=authSource=admin 
 JWT_SECRET=zSev9kZVpQ3D9FnnLUJb7A0pZPl1o3HoC6Ol4zZj1XM=
 
 ## Base URL
