@@ -196,70 +196,76 @@ const updatePaymentStatus = async (req, res) => {
     try {
         const { paymentId } = req.params;
         console.log(paymentId);
-        
+
+        // Obtener status y paymentMethod del cuerpo de la solicitud
         const { status, paymentMethod } = req.body;
 
+        // Buscar el pago por su ID
         const payment = await Payment.findById(paymentId);
         console.log(payment);
-        
+
+        // Verificar si el pago existe
         if (!payment) {
             return res.status(404).json({ message: 'Payment not found' });
         }
 
         let newMovementStatus;
 
+        // Si existe el método de pago, actualizar el estado de pago
         if (paymentMethod) {
-            // Si se proporciona el método de pago, se actualiza el estado a 'processing'
-            payment.status = status;
             payment.paymentMethod = paymentMethod;
-            newMovementStatus = 'processing';
-            await payment.save();
         }
 
-        // Actualizar el movimiento relacionado
+        // Si existe el estado de pago, actualizar el estado
+        if (status) {
+            payment.status = status;
+
+            // Definir el nuevo estado del movimiento en función del estado del pago
+            if (status === 'purchased') {
+                newMovementStatus = 'purchased';
+            } else if (status === 'rejected') {
+                newMovementStatus = 'rejected';
+            } else if (status === 'cancelled') {
+                newMovementStatus = 'cancelled';
+            } else if (status === 'processing') {
+                newMovementStatus = 'processing';
+            }
+        }
+
+        // Guardar cambios en el pago
+        await payment.save();
+
+        // Buscar el movimiento relacionado
         const movement = await Movement.findById(payment.movement);
         console.log(movement);
-        
+
+        // Verificar si el movimiento existe
         if (!movement) {
             return res.status(404).json({ message: 'Movement not found' });
         }
 
-        // Actualiza el estado del movimiento
-        movement.status = newMovementStatus; 
+        // Si hay un nuevo estado de movimiento, actualizarlo
+        if (newMovementStatus) {
+            movement.status = newMovementStatus;
 
-        // Agregar nuevo estado a la historia
-        movement.statusHistory.push({
-            status: newMovementStatus,
-            date: new Date(), // o puedes usar una fecha específica si lo prefieres
-        });
+            // Agregar nuevo estado a la historia
+            movement.statusHistory.push({
+                status: newMovementStatus,
+                date: new Date(), // Puedes ajustar esta fecha si lo necesitas
+            });
 
-        await movement.save(); // Guarda el movimiento actualizado
-        // if (status === 'accepted') {
-        //     newMovementStatus = 'purchased';
-        // } else if (status === 'rejected' || status === 'cancelled') {
-        //     newMovementStatus = 'cancelled';
+            // Guardar cambios en el movimiento
+            await movement.save();
+        }
 
-        //     const showing = await Showing.findById(payment.movement.showing);
-        //     if (!showing) {
-        //         return res.status(404).json({ message: 'Showing not found' });
-        //     }
-
-        //     showing.availableSeats.forEach(seat => {
-        //         if (payment.movement.seats.includes(seat.name)) {
-        //             seat.available = true;
-        //         }
-        //     });
-
-        //     await showing.save();
-        // } else {
-        //     return res.status(400).json({ message: 'Invalid status' });
-        // }
+        // Responder con éxito
         res.status(200).json({ message: 'Payment updated and movement status changed', payment, movement });
     } catch (error) {
         console.error('Error updating payment status:', error);
         res.status(500).json({ message: 'Error updating payment status', error: error.message });
     }
 };
+
 
 
 module.exports = {
