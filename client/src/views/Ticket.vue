@@ -19,7 +19,7 @@
                         <h3 class="font-bold text-[13px] text-[#787878]">Cinema</h3>
                         <p class="text-xl font-bold">Cine Campus</p>
                     </div>
-                    <img src="../assets/img/palomitas.png" alt="Cinema Logo" class="w-10 h-10 rounded" />
+                    <img src="../assets/img/popcorn.svg" alt="Cinema Logo" class="w-10 h-10 rounded" />
                 </div>
 
                 <div class="grid grid-cols-3 mb-4">
