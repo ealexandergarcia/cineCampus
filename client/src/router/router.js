@@ -6,6 +6,7 @@ import OpenningScreen from "../views/OpenningScreen.vue";
 import Cinema from "../views/Cinema.vue";
 import ChooseSeat from "../views/ChooseSeat.vue";
 import Order from "../views/Order.vue";
+import Loading from "../views/Loading.vue";
 
 // Definición de las rutas
 const routes = [
@@ -16,6 +17,7 @@ const routes = [
   { path: '/cinema', component: Cinema },
   { path: '/ChooseSeat', component: ChooseSeat },
   { path: '/Order', component: Order },
+  { path: '/Loading', component: Loading },
 ];
 
 // Creación del router
